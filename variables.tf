@@ -13,13 +13,6 @@ variable "model" {
 Fabric > Policies > Pod > Date and Time - Sensitive Variables
 _______________________________________________________________________________________________________________________
 */
-variable "ntp_key" {
-  default     = ""
-  description = "Key to assigned to NTP."
-  sensitive   = true
-  type        = string
-}
-
 variable "ntp_key_1" {
   default     = ""
   description = "Key Assigned to NTP id 1."

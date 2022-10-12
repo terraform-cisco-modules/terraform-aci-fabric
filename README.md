@@ -26,7 +26,6 @@ A comprehensive example using this module is available here: https://github.com/
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_model"></a> [model](#input\_model) | Model data. | `any` | n/a | yes |
-| <a name="input_ntp_key"></a> [ntp\_key](#input\_ntp\_key) | Key to assigned to NTP. | `string` | `""` | no |
 | <a name="input_ntp_key_1"></a> [ntp\_key\_1](#input\_ntp\_key\_1) | Key Assigned to NTP id 1. | `string` | `""` | no |
 | <a name="input_ntp_key_2"></a> [ntp\_key\_2](#input\_ntp\_key\_2) | Key Assigned to NTP id 2. | `string` | `""` | no |
 | <a name="input_ntp_key_3"></a> [ntp\_key\_3](#input\_ntp\_key\_3) | Key Assigned to NTP id 3. | `string` | `""` | no |
