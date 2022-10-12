@@ -20,9 +20,9 @@ locals {
   pod = lookup(
     lookup(local.fabric, "policies", {}), "pod", []
   )
-  pods      = local.defaults.fabric.pods
-  SNMP      = local.defaults.fabric.policies.pod.snmp
-  time      = local.defaults.fabric.policies.pod.date_and_time
+  pods = local.defaults.fabric.pods
+  SNMP = local.defaults.fabric.policies.pod.snmp
+  time = local.defaults.fabric.policies.pod.date_and_time
 
   #__________________________________________________________
   #
