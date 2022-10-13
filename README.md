@@ -51,6 +51,8 @@ A comprehensive example using this module is available here: https://github.com/
 | Name | Description |
 |------|-------------|
 | <a name="output_date_and_time"></a> [date\_and\_time](#output\_date\_and\_time) | n/a |
+| <a name="output_dns_profiles"></a> [dns\_profiles](#output\_dns\_profiles) | n/a |
+| <a name="output_snmp_client_groups"></a> [snmp\_client\_groups](#output\_snmp\_client\_groups) | n/a |
 | <a name="output_snmp_policies"></a> [snmp\_policies](#output\_snmp\_policies) | n/a |
 ## Resources
 

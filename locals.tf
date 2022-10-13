@@ -538,7 +538,7 @@ locals {
           policy         = key
         }
       ]
-    ]) : "${i.policy}_${i.domain}" => i
+    ]) : "${i.policy}-${i.domain}" => i
   }
 
   dns_providers = {
@@ -552,7 +552,7 @@ locals {
           policy       = key
         }
       ]
-    ]) : "${i.policy}_${i.dns_provider}" => i
+    ]) : "${i.policy}-${i.dns_provider}" => i
   }
 
   #__________________________________________________________
@@ -595,7 +595,7 @@ locals {
           snmp_policy = key
         }
       ]
-    ]) : "${i.snmp_policy}_${i.name}" => i
+    ]) : "${i.snmp_policy}-${i.name}" => i
   }
 
   snmp_client_group_clients = {
@@ -609,7 +609,7 @@ locals {
           client_group = value.name
         }
       ]
-    ]) : "${i.snmp_policy}_${i.client_group}_${i.address}" => i
+    ]) : "${i.snmp_policy}-${i.client_group}-${i.address}" => i
   }
 
   snmp_communities = {
@@ -621,7 +621,7 @@ locals {
           snmp_policy        = key
         }
       ]
-    ]) : "${i.snmp_policy}_${i.community_variable}" => i
+    ]) : "${i.snmp_policy}-${i.community_variable}" => i
   }
 
   snmp_policies_users = {
@@ -637,7 +637,7 @@ locals {
           username           = v.username
         }
       ]
-    ]) : "${i.snmp_policy}_${i.username}" => i
+    ]) : "${i.snmp_policy}-${i.username}" => i
   }
 
   snmp_trap_destinations = {
@@ -659,6 +659,6 @@ locals {
           version = length(compact([lookup(v, "username", "")])) > 0 ? "v3" : "v2c"
         }
       ]
-    ]) : "${i.snmp_policy}_${i.host}" => i
+    ]) : "${i.snmp_policy}-${i.host}" => i
   }
 }
