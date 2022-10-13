@@ -504,7 +504,7 @@ locals {
           ) : local.time.ntp_servers.preferred
         }
       ]
-    ]) : "${i.policy}_${i.hostname}" => i
+    ]) : "${i.policy}-${i.hostname}" => i
   }
 
 
