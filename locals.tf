@@ -32,12 +32,12 @@ locals {
   date_and_time = {
     for v in lookup(local.pod, "date_and_time", []) : v.name => {
       administrative_state = lookup(v, "administrative_state", local.time.administrative_state)
-      annotation           = coalesce(lookup(v, "annotation", local.time.annotation), local.defaults.annotation)
+      annotation           = coalesce(lookup(v, "annotation", local.time.annotation), var.annotation)
       authentication_keys  = lookup(v, "authentication_keys", [])
       description          = lookup(v, "description", local.time.description)
       display_format       = lookup(v, "display_format", local.time.display_format)
       management_epg       = lookup(v, "management_epg", local.time.management_epg)
-      mgmt_epg_type = local.defaults.management_epgs[index(local.defaults.management_epgs.*.name,
+      mgmt_epg_type = var.management_epgs[index(var.management_epgs.*.name,
         lookup(v, "management_epg", local.time.management_epg))
       ].type
       master_mode   = lookup(v, "master_mode", local.time.master_mode)
@@ -483,14 +483,12 @@ locals {
   ntp_servers = {
     for i in flatten([
       for k, v in local.date_and_time : [
-        for s in range(length([for a in v.ntp_servers : a[0]])) : {
-          annotation  = v.annotation
-          description = lookup(v, "description", local.time.description)
-          hostname    = element(v.ntp_servers[s], 0)
-          policy      = k
-          key_id = length(
-            v.ntp_servers[s]) == 3 ? element(v.ntp_servers[s], 2
-          ) : local.time.ntp_servers.key_id
+        for s in lookup(v, "ntp_servers", []) : {
+          annotation     = v.annotation
+          description    = lookup(v, "description", local.time.description)
+          hostname       = s.ntp_server
+          policy         = k
+          key_id         = lookup(s, "key_id", local.time.ntp_servers.key_id)
           management_epg = v.management_epg
           mgmt_epg_type  = v.mgmt_epg_type
           maximum_polling_interval = lookup(
@@ -499,9 +497,7 @@ locals {
           minimum_polling_interval = lookup(
             v, "minimum_polling_interval", local.time.minimum_polling_interval
           )
-          preferred = length(
-            v.ntp_servers[s]) > 1 ? element(v.ntp_servers[s], 1
-          ) : local.time.ntp_servers.preferred
+          preferred = lookup(s, "preferred", local.time.ntp_servers.preferred)
         }
       ]
     ]) : "${i.policy}:${i.hostname}" => i
@@ -515,13 +511,13 @@ locals {
 
   dns_profiles = {
     for v in lookup(local.global, "dns_profiles", []) : v.name => {
-      annotation            = coalesce(lookup(v, "annotation", local.dns.annotation), local.defaults.annotation)
+      annotation            = coalesce(lookup(v, "annotation", local.dns.annotation), var.annotation)
       description           = lookup(v, "description", local.dns.description)
       dns_domains           = lookup(v, "dns_domains", [])
       dns_providers         = lookup(v, "dns_providers", [])
       ip_version_preference = lookup(v, "ip_version_preference", local.dns.ip_version_preference)
       management_epg        = lookup(v, "management_epg", local.dns.management_epg)
-      mgmt_epg_type = local.defaults.management_epgs[index(local.defaults.management_epgs.*.name,
+      mgmt_epg_type = var.management_epgs[index(var.management_epgs.*.name,
         lookup(v, "management_epg", local.dns.management_epg))
       ].type
     }
@@ -563,7 +559,7 @@ locals {
   snmp_policies = {
     for v in lookup(local.pod, "snmp", []) : v.name => {
       admin_state = lookup(v, "admin_state", local.SNMP.admin_state)
-      annotation  = coalesce(lookup(v, "annotation", local.SNMP.annotation), local.defaults.annotation)
+      annotation  = coalesce(lookup(v, "annotation", local.SNMP.annotation), var.annotation)
       contact     = lookup(v, "contact", local.SNMP.contact)
       description = lookup(v, "description", local.SNMP.description)
       include_types = {
@@ -588,7 +584,7 @@ locals {
           clients        = lookup(v, "clients", [])
           description    = lookup(v, "description", local.SNMP.snmp_client_groups.description)
           management_epg = lookup(v, "management_epg", local.SNMP.snmp_client_groups.management_epg)
-          mgmt_epg_type = local.defaults.management_epgs[index(local.defaults.management_epgs.*.name,
+          mgmt_epg_type = var.management_epgs[index(var.management_epgs.*.name,
             lookup(v, "management_epg", local.SNMP.snmp_client_groups.management_epg))
           ].type
           name        = v.name
@@ -648,7 +644,7 @@ locals {
           community_variable = lookup(v, "community_variable", 0)
           host               = v.host
           management_epg     = lookup(v, "management_epg", local.SNMP.snmp_destinations.management_epg)
-          mgmt_epg_type = local.defaults.management_epgs[index(local.defaults.management_epgs.*.name,
+          mgmt_epg_type = var.management_epgs[index(var.management_epgs.*.name,
             lookup(v, "management_epg", local.SNMP.snmp_destinations.management_epg))
           ].type
           port        = lookup(v, "port", local.SNMP.snmp_destinations.port)
