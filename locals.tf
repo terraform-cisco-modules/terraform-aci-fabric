@@ -36,15 +36,11 @@ locals {
       authentication_keys  = lookup(v, "authentication_keys", [])
       description          = lookup(v, "description", local.time.description)
       display_format       = lookup(v, "display_format", local.time.display_format)
-      management_epg       = lookup(v, "management_epg", local.time.management_epg)
-      mgmt_epg_type = var.management_epgs[index(var.management_epgs.*.name,
-        lookup(v, "management_epg", local.time.management_epg))
-      ].type
-      master_mode   = lookup(v, "master_mode", local.time.master_mode)
-      ntp_servers   = lookup(v, "ntp_servers", [])
-      offset_state  = lookup(v, "offset_state", local.time.offset_state)
-      server_state  = lookup(v, "server_state", local.time.server_state)
-      stratum_value = lookup(v, "stratum_value", local.time.stratum_value)
+      master_mode          = lookup(v, "master_mode", local.time.master_mode)
+      ntp_servers          = lookup(v, "ntp_servers", [])
+      offset_state         = lookup(v, "offset_state", local.time.offset_state)
+      server_state         = lookup(v, "server_state", local.time.server_state)
+      stratum_value        = lookup(v, "stratum_value", local.time.stratum_value)
       time_zone = length(regexall(
         "Africa/Abidjan", lookup(v, "time_zone", local.time.time_zone))) > 0 ? "p0_Africa-Abidjan" : length(regexall(
         "Africa/Accra", lookup(v, "time_zone", local.time.time_zone))) > 0 ? "p0_Africa-Accra" : length(regexall(
@@ -486,11 +482,13 @@ locals {
         for s in lookup(v, "ntp_servers", []) : {
           annotation     = v.annotation
           description    = lookup(v, "description", local.time.description)
-          hostname       = s.ntp_server
+          hostname       = s.hostname
           policy         = k
           key_id         = lookup(s, "key_id", local.time.ntp_servers.key_id)
-          management_epg = v.management_epg
-          mgmt_epg_type  = v.mgmt_epg_type
+          management_epg = lookup(s, "management_epg", local.time.management_epg)
+          mgmt_epg_type = var.management_epgs[index(var.management_epgs.*.name,
+            lookup(s, "management_epg", local.time.management_epg))
+          ].type
           maximum_polling_interval = lookup(
             v, "maximum_polling_interval", local.time.maximum_polling_interval
           )
