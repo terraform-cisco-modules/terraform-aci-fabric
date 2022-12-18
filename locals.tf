@@ -8,18 +8,14 @@ locals {
   dns                  = local.defaults.fabric.policies.global.dns_profiles
   fabric               = lookup(var.model, "fabric", {})
   fabric_node_controls = local.defaults.fabric.policies.monitoring.fabric_node_controls
-  global = lookup(
-    lookup(local.fabric, "policies", {}), "global", []
-  )
+  global = lookup(lookup(local.fabric, "policies", {}), "global", {})
   l3_interface = local.defaults.fabric.policies.interface.l3_interface
   recommended_settings = lookup(local.fabric, "recommended_settings", {
     fabric_node_controls = false
     l3_interface         = false
     pods                 = false
   })
-  pod = lookup(
-    lookup(local.fabric, "policies", {}), "pod", []
-  )
+  pod = lookup(lookup(local.fabric, "policies", {}), "pod", {})
   pods = local.defaults.fabric.pods
   SNMP = local.defaults.fabric.policies.pod.snmp
   time = local.defaults.fabric.policies.pod.date_and_time
