@@ -19,6 +19,9 @@ resource "aci_rest_managed" "pod_policy_groups" {
 }
 
 resource "aci_rest_managed" "pod_policy_groups_bgp_rr_policy" {
+  depends_on = [
+    aci_rest_managed.pod_policy_groups
+  ]
   for_each   = { for v in toset(["default"]) : "default" => v if local.recommended_settings.pods == true }
   dn         = "uni/fabric/funcprof/podpgrp-${each.key}/rspodPGrpBGPRRP"
   class_name = "fabricRsPodPGrpBGPRRP"
@@ -28,6 +31,9 @@ resource "aci_rest_managed" "pod_policy_groups_bgp_rr_policy" {
 }
 
 resource "aci_rest_managed" "pod_policy_groups_coop_policy" {
+  depends_on = [
+    aci_rest_managed.pod_policy_groups
+  ]
   for_each   = { for v in toset(["default"]) : "default" => v if local.recommended_settings.pods == true }
   dn         = "uni/fabric/funcprof/podpgrp-${each.key}/rspodPGrpCoopP"
   class_name = "fabricRsPodPGrpCoopP"
@@ -37,6 +43,9 @@ resource "aci_rest_managed" "pod_policy_groups_coop_policy" {
 }
 
 resource "aci_rest_managed" "pod_policy_groups_date_and_time_policy" {
+  depends_on = [
+    aci_rest_managed.pod_policy_groups
+  ]
   for_each   = { for v in toset(["default"]) : "default" => v if local.recommended_settings.pods == true }
   dn         = "uni/fabric/funcprof/podpgrp-${each.key}/rsTimePol"
   class_name = "fabricRsTimePol"
@@ -46,6 +55,9 @@ resource "aci_rest_managed" "pod_policy_groups_date_and_time_policy" {
 }
 
 resource "aci_rest_managed" "pod_policy_groups_isis_policy" {
+  depends_on = [
+    aci_rest_managed.pod_policy_groups
+  ]
   for_each   = { for v in toset(["default"]) : "default" => v if local.recommended_settings.pods == true }
   dn         = "uni/fabric/funcprof/podpgrp-${each.key}/rspodPGrpIsisDomP"
   class_name = "fabricRsPodPGrpIsisDomP"
@@ -55,6 +67,9 @@ resource "aci_rest_managed" "pod_policy_groups_isis_policy" {
 }
 
 resource "aci_rest_managed" "pod_policy_groups_macsec_policy" {
+  depends_on = [
+    aci_rest_managed.pod_policy_groups
+  ]
   for_each   = { for v in toset(["default"]) : "default" => v if local.recommended_settings.pods == true }
   dn         = "uni/fabric/funcprof/podpgrp-${each.key}/rsmacsecPol"
   class_name = "fabricRsMacsecPol"
@@ -64,6 +79,9 @@ resource "aci_rest_managed" "pod_policy_groups_macsec_policy" {
 }
 
 resource "aci_rest_managed" "pod_policy_groups_mgmt_policy" {
+  depends_on = [
+    aci_rest_managed.pod_policy_groups
+  ]
   for_each   = { for v in toset(["default"]) : "default" => v if local.recommended_settings.pods == true }
   dn         = "uni/fabric/funcprof/podpgrp-${each.key}/rsCommPol"
   class_name = "fabricRsCommPol"
@@ -73,6 +91,9 @@ resource "aci_rest_managed" "pod_policy_groups_mgmt_policy" {
 }
 
 resource "aci_rest_managed" "pod_policy_groups_snmp_policy" {
+  depends_on = [
+    aci_rest_managed.pod_policy_groups
+  ]
   for_each   = { for v in toset(["default"]) : "default" => v if local.recommended_settings.pods == true }
   dn         = "uni/fabric/funcprof/podpgrp-${each.key}/rssnmpPol"
   class_name = "fabricRsSnmpPol"
