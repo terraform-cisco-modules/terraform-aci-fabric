@@ -3,8 +3,8 @@
 Model Data from Top Level Module
 _______________________________________________________________________________________________________________________
 */
-variable "model" {
-  description = "Model data."
+variable "fabric" {
+  description = "Fabric Model data."
   type        = any
 }
 
@@ -14,29 +14,6 @@ variable "model" {
 Global Shared Variables
 _______________________________________________________________________________________________________________________
 */
-
-
-variable "annotation" {
-  default     = "orchestrator:terraform:easy-aci-v2.0"
-  description = "The Version of this Script."
-  type        = string
-}
-
-variable "annotations" {
-  default = [
-    {
-      key   = "orchestrator"
-      value = "terraform:easy-aci:v2.0"
-    }
-  ]
-  description = "The Version of this Script."
-  type = list(object(
-    {
-      key   = string
-      value = string
-    }
-  ))
-}
 
 variable "controller_type" {
   default     = "apic"
@@ -68,6 +45,54 @@ variable "management_epgs" {
       type = string
     }
   ))
+}
+
+
+/*_____________________________________________________________________________________________________________________
+
+Fabric > Policies > Pod > Management Access: default - Sensitive Variables
+_______________________________________________________________________________________________________________________
+*/
+variable "apic_certificate_1" {
+  default     = ""
+  description = "APIC Certificate 1."
+  sensitive   = true
+  type        = string
+}
+
+variable "apic_certificate_2" {
+  default     = ""
+  description = "APIC Certificate 2."
+  sensitive   = true
+  type        = string
+}
+
+variable "apic_intermediate_plus_root_ca_1" {
+  default     = ""
+  description = "Intermediate and Root CA Certificate 1."
+  sensitive   = true
+  type        = string
+}
+
+variable "apic_intermediate_plus_root_ca_2" {
+  default     = ""
+  description = "Intermediate and Root CA Certificate 2."
+  sensitive   = true
+  type        = string
+}
+
+variable "apic_private_key_1" {
+  default     = ""
+  description = "APIC Private Key 1."
+  sensitive   = true
+  type        = string
+}
+
+variable "apic_private_key_2" {
+  default     = ""
+  description = "APIC Private Key 2."
+  sensitive   = true
+  type        = string
 }
 
 

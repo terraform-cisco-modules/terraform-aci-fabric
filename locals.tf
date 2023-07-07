@@ -4,21 +4,20 @@ locals {
   # Model Inputs
   #__________________________________________________________
 
-  defaults             = lookup(var.model, "defaults", {})
-  dns                  = local.defaults.fabric.policies.global.dns_profiles
-  fabric               = lookup(var.model, "fabric", {})
-  fabric_node_controls = local.defaults.fabric.policies.monitoring.fabric_node_controls
-  global = lookup(lookup(local.fabric, "policies", {}), "global", {})
-  l3_interface = local.defaults.fabric.policies.interface.l3_interface
-  recommended_settings = lookup(local.fabric, "recommended_settings", {
+  defaults             = yamldecode(file("${path.module}/defaults.yaml")).defaults.fabric
+  dns                  = local.defaults.policies.global.dns_profiles
+  fabric_node_controls = local.defaults.policies.monitoring.fabric_node_controls
+  global               = lookup(lookup(var.fabric, "policies", {}), "global", {})
+  l3_interface         = local.defaults.policies.interface.l3_interface
+  recommended_settings = lookup(var.fabric, "recommended_settings", {
     fabric_node_controls = false
     l3_interface         = false
     pods                 = false
   })
-  pod = lookup(lookup(local.fabric, "policies", {}), "pod", {})
-  pods = local.defaults.fabric.pods
-  SNMP = local.defaults.fabric.policies.pod.snmp
-  time = local.defaults.fabric.policies.pod.date_and_time
+  pod  = lookup(lookup(var.fabric, "policies", {}), "pod", {})
+  pods = local.defaults.pods
+  SNMP = local.defaults.policies.pod.snmp
+  time = local.defaults.policies.pod.date_and_time
 
   #__________________________________________________________
   #
@@ -28,15 +27,18 @@ locals {
   date_and_time = {
     for v in lookup(local.pod, "date_and_time", []) : v.name => {
       administrative_state = lookup(v, "administrative_state", local.time.administrative_state)
-      annotation           = coalesce(lookup(v, "annotation", local.time.annotation), var.annotation)
       authentication_keys  = lookup(v, "authentication_keys", [])
       description          = lookup(v, "description", local.time.description)
       display_format       = lookup(v, "display_format", local.time.display_format)
-      master_mode          = lookup(v, "master_mode", local.time.master_mode)
-      ntp_servers          = lookup(v, "ntp_servers", [])
-      offset_state         = lookup(v, "offset_state", local.time.offset_state)
-      server_state         = lookup(v, "server_state", local.time.server_state)
-      stratum_value        = lookup(v, "stratum_value", local.time.stratum_value)
+      management_epg       = lookup(v, "management_epg", local.time.management_epg)
+      mgmt_epg_type = var.management_epgs[index(var.management_epgs.*.name,
+        lookup(v, "management_epg", local.time.management_epg))
+      ].type
+      master_mode   = lookup(v, "master_mode", local.time.master_mode)
+      ntp_servers   = lookup(v, "ntp_servers", [])
+      offset_state  = lookup(v, "offset_state", local.time.offset_state)
+      server_state  = lookup(v, "server_state", local.time.server_state)
+      stratum_value = lookup(v, "stratum_value", local.time.stratum_value)
       time_zone = length(regexall(
         "Africa/Abidjan", lookup(v, "time_zone", local.time.time_zone))) > 0 ? "p0_Africa-Abidjan" : length(regexall(
         "Africa/Accra", lookup(v, "time_zone", local.time.time_zone))) > 0 ? "p0_Africa-Accra" : length(regexall(
@@ -476,15 +478,12 @@ locals {
     for i in flatten([
       for k, v in local.date_and_time : [
         for s in lookup(v, "ntp_servers", []) : {
-          annotation     = v.annotation
           description    = lookup(v, "description", local.time.description)
           hostname       = s.hostname
           policy         = k
           key_id         = lookup(s, "key_id", local.time.ntp_servers.key_id)
-          management_epg = lookup(s, "management_epg", local.time.management_epg)
-          mgmt_epg_type = var.management_epgs[index(var.management_epgs.*.name,
-            lookup(s, "management_epg", local.time.management_epg))
-          ].type
+          management_epg = v.management_epg
+          mgmt_epg_type  = v.mgmt_epg_type
           maximum_polling_interval = lookup(
             v, "maximum_polling_interval", local.time.maximum_polling_interval
           )
@@ -500,12 +499,26 @@ locals {
 
   #__________________________________________________________
   #
+  # APIC Certificate
+  #__________________________________________________________
+
+  apic_certificates = [
+    for v in lookup(local.pod, "apic_certificates", []) : {
+      activate_certificate = v.activate_certificate
+      modulus              = v.modulus
+      name                 = v.name
+      trustpoint           = v.trustpoint
+      var_identity         = v.var_identity
+    }
+  ]
+
+  #__________________________________________________________
+  #
   # DNS Profile
   #__________________________________________________________
 
   dns_profiles = {
     for v in lookup(local.global, "dns_profiles", []) : v.name => {
-      annotation            = coalesce(lookup(v, "annotation", local.dns.annotation), var.annotation)
       description           = lookup(v, "description", local.dns.description)
       dns_domains           = lookup(v, "dns_domains", [])
       dns_providers         = lookup(v, "dns_providers", [])
@@ -521,7 +534,6 @@ locals {
     for i in flatten([
       for key, value in local.dns_profiles : [
         for v in value.dns_domains : {
-          annotation     = value.annotation
           domain         = v.domain
           default_domain = lookup(v, "default_domain", local.dns.dns_domains.default_domain)
           description    = lookup(v, "description", local.dns.dns_domains.description)
@@ -535,7 +547,6 @@ locals {
     for i in flatten([
       for key, value in local.dns_profiles : [
         for v in value.dns_providers : {
-          annotation   = value.annotation
           description  = lookup(v, "description", local.dns.dns_providers.description)
           dns_provider = v.dns_provider
           preferred    = lookup(v, "preferred", local.dns.dns_providers.preferred)
@@ -553,7 +564,6 @@ locals {
   snmp_policies = {
     for v in lookup(local.pod, "snmp", []) : v.name => {
       admin_state = lookup(v, "admin_state", local.SNMP.admin_state)
-      annotation  = coalesce(lookup(v, "annotation", local.SNMP.annotation), var.annotation)
       contact     = lookup(v, "contact", local.SNMP.contact)
       description = lookup(v, "description", local.SNMP.description)
       include_types = {
@@ -574,7 +584,6 @@ locals {
     for i in flatten([
       for key, value in local.snmp_policies : [
         for k, v in value.snmp_client_groups : {
-          annotation     = value.annotation
           clients        = lookup(v, "clients", [])
           description    = lookup(v, "description", local.SNMP.snmp_client_groups.description)
           management_epg = lookup(v, "management_epg", local.SNMP.snmp_client_groups.management_epg)
@@ -592,7 +601,6 @@ locals {
     for i in flatten([
       for key, value in local.snmp_client_groups : [
         for v in value.clients : {
-          annotation   = value.annotation
           address      = v.address
           name         = lookup(v, "name", v.address)
           snmp_policy  = value.snmp_policy
@@ -618,7 +626,6 @@ locals {
     for i in flatten([
       for key, value in local.snmp_policies : [
         for k, v in value.users : {
-          annotation         = value.annotation
           authorization_key  = v.authorization_key
           authorization_type = lookup(v, "authorization_type", local.SNMP.users.authorization_type)
           privacy_key        = lookup(v, "privacy_key", 0)
@@ -634,7 +641,6 @@ locals {
     for i in flatten([
       for key, value in local.snmp_policies : [
         for k, v in value.snmp_destinations : {
-          annotation         = value.annotation
           community_variable = lookup(v, "community_variable", 0)
           host               = v.host
           management_epg     = lookup(v, "management_epg", local.SNMP.snmp_destinations.management_epg)

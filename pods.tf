@@ -12,7 +12,6 @@ resource "aci_rest_managed" "pod_policy_groups" {
   dn         = "uni/fabric/funcprof/podpgrp-${each.key}"
   class_name = "fabricPodPGrp"
   content = {
-    # annotation = coalesce(local.pods.policy_group.annotation, var.annotation)
     descr = local.pods.policy_group.description
     name  = each.key
   }
@@ -120,7 +119,6 @@ resource "aci_rest_managed" "pod_profiles" {
   class_name = "fabricPodP"
   dn         = "uni/fabric/podprof-${each.key}"
   content = {
-    # annotation = coalesce(local.pods.profile.annotation, var.annotation)
     descr = local.pods.profile.description
     name  = each.key
   }
@@ -147,7 +145,6 @@ resource "aci_rest_managed" "pod_profile_selectors_all" {
   class_name = "fabricPodS"
   dn         = "uni/fabric/podprof-${each.key}/pods-${each.key}-typ-ALL"
   content = {
-    # annotation = coalesce(local.pods.profile.annotation, var.annotation)
     name = each.key
     type = local.pods.profile.pod_selector_type
   }
@@ -181,9 +178,8 @@ resource "aci_rest_managed" "pod_profile_selectors_range" {
   class_name = "fabricPodS"
   dn         = "uni/fabric/podprof-default/pods-${each.key}-typ-range"
   content = {
-    annotation = coalesce(local.pods.profile.annotation, var.annotation)
-    name       = each.key
-    type       = local.pods.profile.pod_selector_type
+    name = each.key
+    type = local.pods.profile.pod_selector_type
   }
   child {
     rn = length(

@@ -15,21 +15,25 @@ A comprehensive example using this module is available here: https://github.com/
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3.0 |
-| <a name="requirement_aci"></a> [aci](#requirement\_aci) | >= 2.5.2 |
+| <a name="requirement_aci"></a> [aci](#requirement\_aci) | >= 2.8.0 |
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aci"></a> [aci](#provider\_aci) | >= 2.5.2 |
+| <a name="provider_aci"></a> [aci](#provider\_aci) | >= 2.8.0 |
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_model"></a> [model](#input\_model) | Model data. | `any` | n/a | yes |
-| <a name="input_annotation"></a> [annotation](#input\_annotation) | The Version of this Script. | `string` | `"orchestrator:terraform:easy-aci-v2.0"` | no |
-| <a name="input_annotations"></a> [annotations](#input\_annotations) | The Version of this Script. | <pre>list(object(<br>    {<br>      key   = string<br>      value = string<br>    }<br>  ))</pre> | <pre>[<br>  {<br>    "key": "orchestrator",<br>    "value": "terraform:easy-aci:v2.0"<br>  }<br>]</pre> | no |
+| <a name="input_fabric"></a> [fabric](#input\_fabric) | Fabric Model data. | `any` | n/a | yes |
 | <a name="input_controller_type"></a> [controller\_type](#input\_controller\_type) | The Type of Controller for this Site.<br>- apic<br>- ndo | `string` | `"apic"` | no |
 | <a name="input_management_epgs"></a> [management\_epgs](#input\_management\_epgs) | The Management EPG's that will be used by the script.<br>- name: Name of the EPG<br>- type: Type of EPG<br>  * inb<br>  * oob | <pre>list(object(<br>    {<br>      name = string<br>      type = string<br>    }<br>  ))</pre> | <pre>[<br>  {<br>    "name": "default",<br>    "type": "oob"<br>  }<br>]</pre> | no |
+| <a name="input_apic_certificate__1"></a> [apic\_certificate\_\_1](#input\_apic\_certificate\_\_1) | APIC Certificate 1. | `string` | `""` | no |
+| <a name="input_apic_certificate_2"></a> [apic\_certificate\_2](#input\_apic\_certificate\_2) | APIC Certificate 2. | `string` | `""` | no |
+| <a name="input_apic_intermediate_plus_root_ca_1"></a> [apic\_intermediate\_plus\_root\_ca\_1](#input\_apic\_intermediate\_plus\_root\_ca\_1) | Intermediate and Root CA Certificate 1. | `string` | `""` | no |
+| <a name="input_apic_intermediate_plus_root_ca_2"></a> [apic\_intermediate\_plus\_root\_ca\_2](#input\_apic\_intermediate\_plus\_root\_ca\_2) | Intermediate and Root CA Certificate 2. | `string` | `""` | no |
+| <a name="input_apic_private_key_1"></a> [apic\_private\_key\_1](#input\_apic\_private\_key\_1) | APIC Private Key 1. | `string` | `""` | no |
+| <a name="input_apic_private_key_2"></a> [apic\_private\_key\_2](#input\_apic\_private\_key\_2) | APIC Private Key 2. | `string` | `""` | no |
 | <a name="input_ntp_key_1"></a> [ntp\_key\_1](#input\_ntp\_key\_1) | Key Assigned to NTP id 1. | `string` | `""` | no |
 | <a name="input_ntp_key_2"></a> [ntp\_key\_2](#input\_ntp\_key\_2) | Key Assigned to NTP id 2. | `string` | `""` | no |
 | <a name="input_ntp_key_3"></a> [ntp\_key\_3](#input\_ntp\_key\_3) | Key Assigned to NTP id 3. | `string` | `""` | no |
@@ -64,6 +68,9 @@ A comprehensive example using this module is available here: https://github.com/
 |------|------|
 | [aci_fabric_node_control.fabric_node_controls](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/fabric_node_control) | resource |
 | [aci_l3_interface_policy.l3_interface](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/l3_interface_policy) | resource |
+| [aci_rest_managed.apic_keyring](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.apic_oper_keyring](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.apic_trustpoint](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
 | [aci_rest_managed.date_and_time](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
 | [aci_rest_managed.date_and_time_format](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
 | [aci_rest_managed.dns_domains](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |

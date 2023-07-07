@@ -12,7 +12,6 @@ resource "aci_rest_managed" "date_and_time" {
   class_name = "datetimePol"
   dn         = "uni/fabric/time-${each.key}"
   content = {
-    # annotation   = each.value.annotation
     adminSt      = each.value.administrative_state
     authSt       = length(each.value.authentication_keys) > 0 ? "enabled" : "disabled"
     descr        = each.value.description
@@ -40,8 +39,7 @@ resource "aci_rest_managed" "ntp_authentication_keys" {
   class_name = "datetimeNtpAuthKey"
   dn         = "uni/fabric/time-${each.value.policy}/ntpauth-${each.value.key_id}"
   content = {
-    annotation = each.value.annotation
-    id         = each.value.key_id
+    id = each.value.key_id
     key = length(regexall(
       5, each.value.key_id)) > 0 ? var.ntp_key_5 : length(regexall(
       4, each.value.key_id)) > 0 ? var.ntp_key_4 : length(regexall(
@@ -66,7 +64,6 @@ resource "aci_rest_managed" "ntp_servers" {
   class_name = "datetimeNtpProv"
   dn         = "uni/fabric/time-${each.value.policy}/ntpprov-${each.value.hostname}"
   content = {
-    # annotation = each.value.annotation
     descr      = each.value.description
     keyId      = length(regexall("[1-5]", each.value.key_id)) > 0 ? each.value.key_id : 0
     maxPoll    = each.value.maximum_polling_interval
@@ -99,10 +96,64 @@ resource "aci_rest_managed" "date_and_time_format" {
   class_name = "datetimeFormat"
   dn         = "uni/fabric/format-default"
   content = {
-    # annotation    = each.value.annotation != "" ? each.value.annotation : var.annotation
     displayFormat = each.value.display_format
     showOffset    = each.value.offset_state
     tz            = each.value.time_zone
+  }
+}
+
+
+/*_____________________________________________________________________________________________________________________
+
+API Information:
+ - Class: "pkiTP"
+ - Distinguished Name: "uni/userext/pkiext/keyring-{{name}}"
+GUI Location:
+ - Fabric > Fabric Policies > Policies > Pod > Management Access: default
+_______________________________________________________________________________________________________________________
+*/
+resource "aci_rest_managed" "apic_trustpoint" {
+  for_each   = { for v in local.apic_certificates : v.trustpoint => v if length(regexall("[1-2]", v.var_identifier)) > 0 }
+  class_name = "pkiTP"
+  dn         = "uni/userext/pkiext/tp-${each.key}"
+  content = {
+    certChain = length(regexall("1", each.value.var_identity)
+      ) > 0 ? "${var.apic_intermediate_plus_root_ca_1}" : length(
+      regexall("2", each.value.var_identity)
+    ) > 0 ? "${var.apic_intermediate_plus_root_ca_2}" : ""
+    descr = ""
+    name  = each.key
+  }
+}
+
+resource "aci_rest_managed" "apic_keyring" {
+  for_each   = { for v in local.apic_certificates : v.name => v if length(regexall("[1-2]", v.var_identifier)) > 0 }
+  class_name = "pkiKeyRing"
+  dn         = "uni/userext/pkiext/keyring-${each.key}"
+  content = {
+    adminState = "completed"
+    cert = length(regexall("1", each.value.var_identity)
+      ) > 0 ? "${var.apic_certificate_1}" : length(
+      regexall("2", each.value.var_identity)
+    ) > 0 ? "${var.apic_certificate_2}" : ""
+    descr = ""
+    key = length(regexall("1", each.value.var_identity)
+      ) > 0 ? "${var.apic_private_key_1}" : length(
+      regexall("2", each.value.var_identity)
+    ) > 0 ? "${var.apic_private_key_2}" : ""
+    modulus = "mod${each.value.modulus}"
+    name    = each.key
+    regen   = "no"
+    tp      = each.value.trustpoint
+  }
+}
+
+resource "aci_rest_managed" "apic_oper_keyring" {
+  for_each   = { for v in local.apic_certificates : v.name => v if v.activate_certificate == true }
+  class_name = "commRsKeyRing"
+  dn         = "uni/fabric/comm-default/https/rsKeyRing"
+  content = {
+    tnPkiKeyRingName = each.key
   }
 }
 
@@ -121,7 +172,6 @@ resource "aci_rest_managed" "snmp_policies" {
   class_name = "snmpPol"
   dn         = "uni/fabric/snmppol-${each.key}"
   content = {
-    # annotation = each.value.annotation
     adminSt = each.value.admin_state
     contact = each.value.contact
     descr   = each.value.description
@@ -148,7 +198,6 @@ resource "aci_rest_managed" "snmp_client_groups" {
   class_name = "snmpClientGrpP"
   dn         = "uni/fabric/snmppol-${each.value.snmp_policy}/clgrp-${each.value.name}"
   content = {
-    # annotation = each.value.annotation
     descr = each.value.description
     name  = each.value.name
   }
@@ -181,7 +230,6 @@ resource "aci_rest_managed" "snmp_client_group_clients" {
   dn         = "uni/fabric/snmppol-${each.value.snmp_policy}/clgrp-${each.value.client_group}/client-[${each.value.address}]"
   content = {
     addr = each.value.address
-    # annotation = each.value.annotation
     name = each.value.name
   }
 }
@@ -226,7 +274,6 @@ resource "aci_rest_managed" "snmp_policy_users" {
   class_name = "snmpUserP"
   dn         = "uni/fabric/snmppol-${each.value.snmp_policy}/user-[${each.value.username}]"
   content = {
-    # annotation = each.value.annotation
     authKey = length(regexall(
       5, each.value.authorization_key)) > 0 ? var.snmp_authorization_key_5 : length(regexall(
       4, each.value.authorization_key)) > 0 ? var.snmp_authorization_key_4 : length(regexall(
@@ -288,7 +335,6 @@ resource "aci_rest_managed" "snmp_trap_destinations" {
   class_name = "snmpTrapDest"
   dn         = "uni/fabric/snmpgroup-${each.value.snmp_policy}/trapdest-${each.value.host}-port-${each.value.port}"
   content = {
-    # annotation = each.value.annotation
     host = each.value.host
     port = each.value.port
     secName = each.value.version != "v3" && length(regexall(
@@ -328,7 +374,6 @@ resource "aci_rest_managed" "snmp_policies_trap_servers" {
   dn         = "uni/fabric/snmppol-${each.value.snmp_policy}/trapfwdserver-[${each.value.host}]"
   content = {
     addr = each.value.host
-    # annotation = each.value.annotation
     port = each.value.port
   }
 }
@@ -348,7 +393,6 @@ resource "aci_rest_managed" "snmp_trap_source" {
   class_name = "snmpSrc"
   dn         = "uni/fabric/moncommon/snmpsrc-${each.key}"
   content = {
-    # annotation = each.value.annotation
     incl = alltrue(
       [
         each.value.include_types.audit_logs,

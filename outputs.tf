@@ -21,3 +21,7 @@ output "snmp_policies" {
     keys(aci_rest_managed.snmp_policies)
   ) : v => aci_rest_managed.snmp_policies[v].id } : {}
 }
+
+output "localntp" {
+  value = var.fabric
+}
