@@ -7,7 +7,7 @@ GUI Location:
  - Fabric > Fabric Policies > Policies > Interface > L3 Interface > default
 _______________________________________________________________________________________________________________________
 */
-resource "aci_l3_interface_policy" "l3_interface" {
+resource "aci_l3_interface_policy" "map" {
   for_each = {
     for v in toset(["default"]) : "default" => v if local.recommended_settings.l3_interface == true
   }

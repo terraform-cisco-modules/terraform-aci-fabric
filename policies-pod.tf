@@ -31,7 +31,7 @@ GUI Location:
  - Fabric > Fabric Policies > Policies > Pod > Date and Time > Policy {date_policy}: Authentication Keys: {key_id}
 _______________________________________________________________________________________________________________________
 */
-resource "aci_rest_managed" "ntp_authentication_keys" {
+resource "aci_rest_managed" "date_and_time_authentication_keys" {
   depends_on = [
     aci_rest_managed.date_and_time
   ]
@@ -59,7 +59,7 @@ GUI Location:
  - Fabric > Fabric Policies > Policies > Pod > Date and Time > Policy {date_policy}: NTP Servers
 _______________________________________________________________________________________________________________________
 */
-resource "aci_rest_managed" "ntp_servers" {
+resource "aci_rest_managed" "date_and_time_ntp_servers" {
   for_each   = local.ntp_servers
   class_name = "datetimeNtpProv"
   dn         = "uni/fabric/time-${each.value.policy}/ntpprov-${each.value.hostname}"
@@ -113,7 +113,7 @@ GUI Location:
 _______________________________________________________________________________________________________________________
 */
 resource "aci_rest_managed" "apic_trustpoint" {
-  for_each   = { for v in local.apic_certificates : v.trustpoint => v if length(regexall("[1-2]", v.var_identifier)) > 0 }
+  for_each   = { for v in local.apic_certificates : v.trustpoint => v if length(regexall("[1-2]", v.var_identity)) > 0 }
   class_name = "pkiTP"
   dn         = "uni/userext/pkiext/tp-${each.key}"
   content = {
@@ -127,7 +127,7 @@ resource "aci_rest_managed" "apic_trustpoint" {
 }
 
 resource "aci_rest_managed" "apic_keyring" {
-  for_each   = { for v in local.apic_certificates : v.name => v if length(regexall("[1-2]", v.var_identifier)) > 0 }
+  for_each   = { for v in local.apic_certificates : v.name => v if length(regexall("[1-2]", v.var_identity)) > 0 }
   class_name = "pkiKeyRing"
   dn         = "uni/userext/pkiext/keyring-${each.key}"
   content = {
@@ -190,7 +190,7 @@ GUI Location:
  - Fabric > Fabric Policies > Policies > Pod > SNMP > {snmp_policy}: {client_group}
 _______________________________________________________________________________________________________________________
 */
-resource "aci_rest_managed" "snmp_client_groups" {
+resource "aci_rest_managed" "snmp_policy_client_groups" {
   depends_on = [
     aci_rest_managed.snmp_policies
   ]
@@ -220,10 +220,10 @@ GUI Location:
  - Fabric > Fabric Policies > Policies > Pod > SNMP > default > Client Group Policies: {client_group} > Client Entries
 _______________________________________________________________________________________________________________________
 */
-resource "aci_rest_managed" "snmp_client_group_clients" {
+resource "aci_rest_managed" "snmp_policy_client_group_client_servers" {
   depends_on = [
     aci_rest_managed.snmp_policies,
-    aci_rest_managed.snmp_client_groups
+    aci_rest_managed.snmp_policy_client_groups
   ]
   for_each   = local.snmp_client_group_clients
   class_name = "snmpClientP"
@@ -365,7 +365,7 @@ GUI Location:
  - Fabric > Fabric Policies > Policies > Pod > SNMP > {snmp_policy}: Trap Forward Servers
 _______________________________________________________________________________________________________________________
 */
-resource "aci_rest_managed" "snmp_policies_trap_servers" {
+resource "aci_rest_managed" "snmp_policy_trap_servers" {
   depends_on = [
     aci_rest_managed.snmp_policies
   ]

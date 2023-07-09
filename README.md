@@ -15,12 +15,12 @@ A comprehensive example using this module is available here: https://github.com/
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3.0 |
-| <a name="requirement_aci"></a> [aci](#requirement\_aci) | >= 2.8.0 |
+| <a name="requirement_aci"></a> [aci](#requirement\_aci) | >= 2.9.0 |
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aci"></a> [aci](#provider\_aci) | >= 2.8.0 |
+| <a name="provider_aci"></a> [aci](#provider\_aci) | 2.9.0 |
 ## Inputs
 
 | Name | Description | Type | Default | Required |
@@ -28,7 +28,7 @@ A comprehensive example using this module is available here: https://github.com/
 | <a name="input_fabric"></a> [fabric](#input\_fabric) | Fabric Model data. | `any` | n/a | yes |
 | <a name="input_controller_type"></a> [controller\_type](#input\_controller\_type) | The Type of Controller for this Site.<br>- apic<br>- ndo | `string` | `"apic"` | no |
 | <a name="input_management_epgs"></a> [management\_epgs](#input\_management\_epgs) | The Management EPG's that will be used by the script.<br>- name: Name of the EPG<br>- type: Type of EPG<br>  * inb<br>  * oob | <pre>list(object(<br>    {<br>      name = string<br>      type = string<br>    }<br>  ))</pre> | <pre>[<br>  {<br>    "name": "default",<br>    "type": "oob"<br>  }<br>]</pre> | no |
-| <a name="input_apic_certificate__1"></a> [apic\_certificate\_\_1](#input\_apic\_certificate\_\_1) | APIC Certificate 1. | `string` | `""` | no |
+| <a name="input_apic_certificate_1"></a> [apic\_certificate\_1](#input\_apic\_certificate\_1) | APIC Certificate 1. | `string` | `""` | no |
 | <a name="input_apic_certificate_2"></a> [apic\_certificate\_2](#input\_apic\_certificate\_2) | APIC Certificate 2. | `string` | `""` | no |
 | <a name="input_apic_intermediate_plus_root_ca_1"></a> [apic\_intermediate\_plus\_root\_ca\_1](#input\_apic\_intermediate\_plus\_root\_ca\_1) | Intermediate and Root CA Certificate 1. | `string` | `""` | no |
 | <a name="input_apic_intermediate_plus_root_ca_2"></a> [apic\_intermediate\_plus\_root\_ca\_2](#input\_apic\_intermediate\_plus\_root\_ca\_2) | Intermediate and Root CA Certificate 2. | `string` | `""` | no |
@@ -58,26 +58,24 @@ A comprehensive example using this module is available here: https://github.com/
 
 | Name | Description |
 |------|-------------|
-| <a name="output_date_and_time"></a> [date\_and\_time](#output\_date\_and\_time) | n/a |
-| <a name="output_dns_profiles"></a> [dns\_profiles](#output\_dns\_profiles) | n/a |
-| <a name="output_snmp_client_groups"></a> [snmp\_client\_groups](#output\_snmp\_client\_groups) | n/a |
-| <a name="output_snmp_policies"></a> [snmp\_policies](#output\_snmp\_policies) | n/a |
+| <a name="output_pods"></a> [pods](#output\_pods) | n/a |
+| <a name="output_policies"></a> [policies](#output\_policies) | n/a |
 ## Resources
 
 | Name | Type |
 |------|------|
-| [aci_fabric_node_control.fabric_node_controls](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/fabric_node_control) | resource |
-| [aci_l3_interface_policy.l3_interface](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/l3_interface_policy) | resource |
+| [aci_fabric_node_control.map](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/fabric_node_control) | resource |
+| [aci_l3_interface_policy.map](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/l3_interface_policy) | resource |
 | [aci_rest_managed.apic_keyring](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
 | [aci_rest_managed.apic_oper_keyring](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
 | [aci_rest_managed.apic_trustpoint](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
 | [aci_rest_managed.date_and_time](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.date_and_time_authentication_keys](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
 | [aci_rest_managed.date_and_time_format](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.date_and_time_ntp_servers](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
 | [aci_rest_managed.dns_domains](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
 | [aci_rest_managed.dns_profiles](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
 | [aci_rest_managed.dns_providers](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
-| [aci_rest_managed.ntp_authentication_keys](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
-| [aci_rest_managed.ntp_servers](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
 | [aci_rest_managed.pod_policy_groups](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
 | [aci_rest_managed.pod_policy_groups_bgp_rr_policy](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
 | [aci_rest_managed.pod_policy_groups_coop_policy](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
@@ -89,11 +87,11 @@ A comprehensive example using this module is available here: https://github.com/
 | [aci_rest_managed.pod_profile_selectors_all](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
 | [aci_rest_managed.pod_profile_selectors_range](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
 | [aci_rest_managed.pod_profiles](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
-| [aci_rest_managed.snmp_client_group_clients](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
-| [aci_rest_managed.snmp_client_groups](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
 | [aci_rest_managed.snmp_destination_groups](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
 | [aci_rest_managed.snmp_policies](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
-| [aci_rest_managed.snmp_policies_trap_servers](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.snmp_policy_client_group_client_servers](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.snmp_policy_client_groups](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.snmp_policy_trap_servers](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
 | [aci_rest_managed.snmp_policy_users](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
 | [aci_rest_managed.snmp_trap_destinations](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
 | [aci_rest_managed.snmp_trap_source](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |

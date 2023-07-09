@@ -7,7 +7,7 @@ GUI Location:
  - Fabric > Fabric Policies > Policies > Monitoring > Fabric Node Controls > default
 _______________________________________________________________________________________________________________________
 */
-resource "aci_fabric_node_control" "fabric_node_controls" {
+resource "aci_fabric_node_control" "map" {
   for_each = {
     for v in toset(["default"]) : "default" => v if local.recommended_settings.fabric_node_controls == true
   }
