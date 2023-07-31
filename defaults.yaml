@@ -49,12 +49,6 @@ defaults:
           enable_dom: Dom
           feature_selections: telemetry # analytics, netflow, telemetry
       pod:
-        apic_certificates:
-          activate_certificate: false
-          modulus: 2048
-          name: '**REQUIRED**'
-          trustpoint: '**REQUIRED**'
-          var_identity: 0
         date_and_time:
           administrative_state: enabled
           annotation: ''
@@ -67,7 +61,7 @@ defaults:
           management_epg: default
           master_mode: disabled
           maximum_polling_interval: 6
-          minimum_polling_interval: 5
+          minimum_polling_interval: 4
           name: '**REQUIRED**'
           ntp_servers:
             description: ''

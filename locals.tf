@@ -499,21 +499,6 @@ locals {
 
   #__________________________________________________________
   #
-  # APIC Certificate
-  #__________________________________________________________
-
-  apic_certificates = [
-    for v in lookup(local.pod, "apic_certificates", []) : {
-      activate_certificate = v.activate_certificate
-      modulus              = v.modulus
-      name                 = v.name
-      trustpoint           = v.trustpoint
-      var_identity         = v.var_identity
-    }
-  ]
-
-  #__________________________________________________________
-  #
   # DNS Profile
   #__________________________________________________________
 
