@@ -8,10 +8,9 @@ GUI Location:
 _______________________________________________________________________________________________________________________
 */
 resource "aci_l3_interface_policy" "map" {
-  for_each = {
-    for v in toset(["default"]) : "default" => v if local.recommended_settings.l3_interface == true
-  }
-  bfd_isis    = local.l3_interface.bfd_isis_policy_configuration
-  description = local.l3_interface.description
-  name        = "default"
+  for_each    = { for v in local.l3_interface : v.name => v }
+  annotation  = "orchestrator:terraform"
+  bfd_isis    = each.value.bfd_isis_policy_configuration
+  description = each.value.description
+  name        = each.value.name
 }

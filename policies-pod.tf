@@ -2,9 +2,9 @@
 
 API Information:
  - Class: "datetimePol"
- - Distinguished Name: "uni/fabric/time-{{name}}"
+ - Distinguished Name: "uni/fabric/time-{name}"
 GUI Location:
- - Fabric > Fabric Policies > Policies > Pod > Date and Time > Policy {{name}}
+ - Fabric > Fabric Policies > Policies > Pod > Date and Time > Policy {name}
 _______________________________________________________________________________________________________________________
 */
 resource "aci_rest_managed" "date_and_time" {
@@ -12,6 +12,7 @@ resource "aci_rest_managed" "date_and_time" {
   class_name = "datetimePol"
   dn         = "uni/fabric/time-${each.key}"
   content = {
+    #annotation   = "orchestrator:terraform"
     adminSt      = each.value.administrative_state
     authSt       = length(each.value.authentication_keys) > 0 ? "enabled" : "disabled"
     descr        = each.value.description
@@ -96,6 +97,7 @@ resource "aci_rest_managed" "date_and_time_format" {
   class_name = "datetimeFormat"
   dn         = "uni/fabric/format-default"
   content = {
+    #annotation    = "orchestrator:terraform"
     displayFormat = each.value.display_format
     showOffset    = each.value.offset_state
     tz            = each.value.time_zone
@@ -117,11 +119,12 @@ resource "aci_rest_managed" "snmp_policies" {
   class_name = "snmpPol"
   dn         = "uni/fabric/snmppol-${each.key}"
   content = {
-    adminSt = each.value.admin_state
-    contact = each.value.contact
-    descr   = each.value.description
-    loc     = each.value.location
-    name    = each.key
+    #annotation = "orchestrator:terraform"
+    adminSt    = each.value.admin_state
+    contact    = each.value.contact
+    descr      = each.value.description
+    loc        = each.value.location
+    name       = each.key
   }
 }
 
@@ -257,8 +260,9 @@ resource "aci_rest_managed" "snmp_destination_groups" {
   class_name = "snmpGroup"
   dn         = "uni/fabric/snmpgroup-${each.key}"
   content = {
-    descr = each.value.description
-    name  = each.key
+    #annotation = "orchestrator:terraform"
+    descr      = each.value.description
+    name       = each.key
   }
 }
 
@@ -280,6 +284,7 @@ resource "aci_rest_managed" "snmp_trap_destinations" {
   class_name = "snmpTrapDest"
   dn         = "uni/fabric/snmpgroup-${each.value.snmp_policy}/trapdest-${each.value.host}-port-${each.value.port}"
   content = {
+    #annotation = "orchestrator:terraform"
     host = each.value.host
     port = each.value.port
     secName = each.value.version != "v3" && length(regexall(
@@ -318,6 +323,7 @@ resource "aci_rest_managed" "snmp_policy_trap_servers" {
   class_name = "snmpTrapFwdServerP"
   dn         = "uni/fabric/snmppol-${each.value.snmp_policy}/trapfwdserver-[${each.value.host}]"
   content = {
+    #annotation = "orchestrator:terraform"
     addr = each.value.host
     port = each.value.port
   }
@@ -338,6 +344,7 @@ resource "aci_rest_managed" "snmp_trap_source" {
   class_name = "snmpSrc"
   dn         = "uni/fabric/moncommon/snmpsrc-${each.key}"
   content = {
+    #annotation = "orchestrator:terraform"
     incl = alltrue(
       [
         each.value.include_types.audit_logs,

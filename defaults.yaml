@@ -4,7 +4,6 @@ defaults:
     pods:
       policy_group:
         # Policy Groups and Profiles
-        annotation: ''
         bgp_route_reflector_policy: default
         coop_group_policy: default
         date_time_policy: default
@@ -12,19 +11,17 @@ defaults:
         isis_policy: default
         macsec_policy: default
         management_access_policy: default
-        name: '**REQUIRED**'
+        name: 'default'
         snmp_policy: default
       profile:
-        annotation: ''
         description: ''
-        name: '**REQUIRED**'
+        name: 'default'
         policy_group: default
         pod_selector_type: ALL # ALL or range
-        pods: [1, 2] # Beginning and Ending pod ID's if type is changed to range
+        pods: [1] # Beginning and Ending pod ID's if type is changed to range
     policies:
       global:
         dns_profiles:
-          annotation: ''
           description: ''
           dns_domains:
             domain: '**REQUIRED**'
@@ -39,19 +36,18 @@ defaults:
           name: '**REQUIRED**'
       interface:
         l3_interface:
-          annotation: ''
           bfd_isis_policy_configuration: enabled
           description: ''
+          name: default
       monitoring:
         fabric_node_controls:
-          annotation: ''
           description: ''
           enable_dom: Dom
           feature_selections: telemetry # analytics, netflow, telemetry
+          name: default
       pod:
         date_and_time:
           administrative_state: enabled
-          annotation: ''
           authentication_keys:
             authentication_type: sha1
             key_id: 0
@@ -74,7 +70,6 @@ defaults:
           time_zone: UTC
         snmp:
           admin_state: enabled
-          annotation: ''
           contact: ''
           description: ''
           include_types:

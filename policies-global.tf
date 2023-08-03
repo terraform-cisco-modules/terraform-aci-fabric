@@ -4,7 +4,7 @@ API Information:
  - Class: "dnsProfile"
  - Distinguished Name: "uni/fabric/dnsp-{name}"
 GUI Location:
- - Fabric > Fabric Policies > Policies > Global > DNS Profiles > default: Management EPG
+ - Fabric > Fabric Policies > Policies > Global > DNS Profiles > {name}
 _______________________________________________________________________________________________________________________
 */
 resource "aci_rest_managed" "dns_profiles" {
@@ -12,6 +12,7 @@ resource "aci_rest_managed" "dns_profiles" {
   class_name = "dnsProfile"
   dn         = "uni/fabric/dnsp-${each.key}"
   content = {
+    #annotation      = "orchestrator:terraform"
     descr           = each.value.description
     IPVerPreference = each.value.ip_version_preference
     name            = each.key

@@ -4,41 +4,89 @@ locals {
   # Model Inputs
   #__________________________________________________________
 
-  defaults             = yamldecode(file("${path.module}/defaults.yaml")).defaults.fabric
-  dns                  = local.defaults.policies.global.dns_profiles
-  fabric_node_controls = local.defaults.policies.monitoring.fabric_node_controls
-  global               = lookup(lookup(var.fabric, "policies", {}), "global", {})
-  l3_interface         = local.defaults.policies.interface.l3_interface
-  recommended_settings = lookup(var.fabric, "recommended_settings", {
-    fabric_node_controls = false
-    l3_interface         = false
-    pods                 = false
-  })
-  pod  = lookup(lookup(var.fabric, "policies", {}), "pod", {})
-  pods = local.defaults.pods
-  SNMP = local.defaults.policies.pod.snmp
-  time = local.defaults.policies.pod.date_and_time
+  defaults   = yamldecode(file("${path.module}/defaults.yaml")).defaults.fabric
+  dns        = local.defaults.policies.global.dns_profiles
+  fnc        = local.defaults.policies.monitoring.fabric_node_controls
+  global     = lookup(lookup(var.fabric, "policies", {}), "global", {})
+  interface  = lookup(lookup(var.fabric, "policies", {}), "interface", {})
+  l3int      = local.defaults.policies.interface.l3_interface
+  monitoring = lookup(lookup(var.fabric, "policies", {}), "monitoring", {})
+  lpods      = local.defaults.pods
+  pod        = lookup(lookup(var.fabric, "policies", {}), "pod", {})
+  pods       = lookup(var.fabric, "pods", {})
+  SNMP       = local.defaults.policies.pod.snmp
+  time       = local.defaults.policies.pod.date_and_time
 
   #__________________________________________________________
   #
-  # Date and Time
+  # Pods
+  #__________________________________________________________
+
+  policy_groups = {
+    for v in lookup(local.pods, "policy_groups", []) : v.name => merge(local.lpods.policy_group, v)
+  }
+
+  profiles = {
+    for v in lookup(local.pods, "profiles", []) : v.name => merge(local.lpods.profile, v)
+  }
+
+  #__________________________________________________________
+  #
+  # Policies > Global > DNS Profile
+  #__________________________________________________________
+
+  dns_profiles = {
+    for v in lookup(local.global, "dns_profiles", []) : v.name => {
+      description           = lookup(v, "description", local.dns.description)
+      dns_domains           = lookup(v, "dns_domains", [])
+      dns_providers         = lookup(v, "dns_providers", [])
+      ip_version_preference = lookup(v, "ip_version_preference", local.dns.ip_version_preference)
+      management_epg        = lookup(v, "management_epg", local.dns.management_epg)
+      mgmt_epg_type = var.management_epgs[index(var.management_epgs.*.name,
+        lookup(v, "management_epg", local.dns.management_epg))
+      ].type
+    }
+  }
+
+  dns_domains = {
+    for i in flatten([
+      for key, value in local.dns_profiles : [
+        for v in value.dns_domains : {
+          domain         = v.domain
+          default_domain = lookup(v, "default_domain", local.dns.dns_domains.default_domain)
+          description    = lookup(v, "description", local.dns.dns_domains.description)
+          policy         = key
+        }
+      ]
+    ]) : "${i.policy}:${i.domain}" => i
+  }
+
+  dns_providers = {
+    for i in flatten([
+      for key, value in local.dns_profiles : [
+        for v in value.dns_providers : {
+          description  = lookup(v, "description", local.dns.dns_providers.description)
+          dns_provider = v.dns_provider
+          preferred    = lookup(v, "preferred", local.dns.dns_providers.preferred)
+          policy       = key
+        }
+      ]
+    ]) : "${i.policy}:${i.dns_provider}" => i
+  }
+
+
+  #__________________________________________________________
+  #
+  # Policies > Pod > Date and Time
   #__________________________________________________________
 
   date_and_time = {
-    for v in lookup(local.pod, "date_and_time", []) : v.name => {
-      administrative_state = lookup(v, "administrative_state", local.time.administrative_state)
-      authentication_keys  = lookup(v, "authentication_keys", [])
-      description          = lookup(v, "description", local.time.description)
-      display_format       = lookup(v, "display_format", local.time.display_format)
-      management_epg       = lookup(v, "management_epg", local.time.management_epg)
+    for v in lookup(local.pod, "date_and_time", []) : v.name => merge(local.time, v, {
+      authentication_keys = lookup(v, "authentication_keys", [])
       mgmt_epg_type = var.management_epgs[index(var.management_epgs.*.name,
         lookup(v, "management_epg", local.time.management_epg))
       ].type
-      master_mode   = lookup(v, "master_mode", local.time.master_mode)
-      ntp_servers   = lookup(v, "ntp_servers", [])
-      offset_state  = lookup(v, "offset_state", local.time.offset_state)
-      server_state  = lookup(v, "server_state", local.time.server_state)
-      stratum_value = lookup(v, "stratum_value", local.time.stratum_value)
+      ntp_servers = lookup(v, "ntp_servers", [])
       time_zone = length(regexall(
         "Africa/Abidjan", lookup(v, "time_zone", local.time.time_zone))) > 0 ? "p0_Africa-Abidjan" : length(regexall(
         "Africa/Accra", lookup(v, "time_zone", local.time.time_zone))) > 0 ? "p0_Africa-Accra" : length(regexall(
@@ -456,7 +504,7 @@ locals {
         "Pacific/Wake", lookup(v, "time_zone", local.time.time_zone))) > 0 ? "p720_Pacific-Wake" : length(regexall(
         "Pacific/Wallis", lookup(v, "time_zone", local.time.time_zone))) > 0 ? "p720_Pacific-Wallis" : length(regexall(
       "UTC", lookup(v, "time_zone", local.time.time_zone))) > 0 ? "p0_UTC" : "p0_UTC"
-    }
+    })
   }
 
   ntp_authentication_keys = {
@@ -499,51 +547,25 @@ locals {
 
   #__________________________________________________________
   #
-  # DNS Profile
+  # Policies > Interface > L3 Interface
   #__________________________________________________________
 
-  dns_profiles = {
-    for v in lookup(local.global, "dns_profiles", []) : v.name => {
-      description           = lookup(v, "description", local.dns.description)
-      dns_domains           = lookup(v, "dns_domains", [])
-      dns_providers         = lookup(v, "dns_providers", [])
-      ip_version_preference = lookup(v, "ip_version_preference", local.dns.ip_version_preference)
-      management_epg        = lookup(v, "management_epg", local.dns.management_epg)
-      mgmt_epg_type = var.management_epgs[index(var.management_epgs.*.name,
-        lookup(v, "management_epg", local.dns.management_epg))
-      ].type
-    }
-  }
-
-  dns_domains = {
-    for i in flatten([
-      for key, value in local.dns_profiles : [
-        for v in value.dns_domains : {
-          domain         = v.domain
-          default_domain = lookup(v, "default_domain", local.dns.dns_domains.default_domain)
-          description    = lookup(v, "description", local.dns.dns_domains.description)
-          policy         = key
-        }
-      ]
-    ]) : "${i.policy}:${i.domain}" => i
-  }
-
-  dns_providers = {
-    for i in flatten([
-      for key, value in local.dns_profiles : [
-        for v in value.dns_providers : {
-          description  = lookup(v, "description", local.dns.dns_providers.description)
-          dns_provider = v.dns_provider
-          preferred    = lookup(v, "preferred", local.dns.dns_providers.preferred)
-          policy       = key
-        }
-      ]
-    ]) : "${i.policy}:${i.dns_provider}" => i
-  }
+  l3_interface = [
+    for v in [lookup(local.interface, "l3_interface", {})] : merge(local.l3int, v)
+  ]
 
   #__________________________________________________________
   #
-  # SNMP Policy
+  # Policies > Monitoring > Fabric Node Controls
+  #__________________________________________________________
+
+  fabric_node_controls = [
+    for v in [lookup(local.monitoring, "fabric_node_controls", {})] : merge(local.fnc, v)
+  ]
+
+  #__________________________________________________________
+  #
+  # Policies > Pod > SNMP Policy
   #__________________________________________________________
 
   snmp_policies = {

@@ -8,12 +8,13 @@ GUI Location:
 _______________________________________________________________________________________________________________________
 */
 resource "aci_rest_managed" "pod_policy_groups" {
-  for_each   = { for v in toset(["default"]) : "default" => v if local.recommended_settings.pods == true }
+  for_each   = local.policy_groups
   dn         = "uni/fabric/funcprof/podpgrp-${each.key}"
   class_name = "fabricPodPGrp"
   content = {
-    descr = local.pods.policy_group.description
-    name  = each.key
+    #annotation = "orchestrator:terraform"
+    descr      = each.value.description
+    name       = each.key
   }
 }
 
@@ -21,11 +22,11 @@ resource "aci_rest_managed" "pod_policy_groups_bgp_rr_policy" {
   depends_on = [
     aci_rest_managed.pod_policy_groups
   ]
-  for_each   = { for v in toset(["default"]) : "default" => v if local.recommended_settings.pods == true }
-  dn         = "uni/fabric/funcprof/podpgrp-${each.key}/rspodPGrpBGPRRP"
+  for_each   = local.policy_groups
   class_name = "fabricRsPodPGrpBGPRRP"
+  dn         = "uni/fabric/funcprof/podpgrp-${each.key}/rspodPGrpBGPRRP"
   content = {
-    tnBgpInstPolName = "${local.pods.policy_group.bgp_route_reflector_policy}"
+    tnBgpInstPolName = "${each.value.bgp_route_reflector_policy}"
   }
 }
 
@@ -33,11 +34,11 @@ resource "aci_rest_managed" "pod_policy_groups_coop_policy" {
   depends_on = [
     aci_rest_managed.pod_policy_groups
   ]
-  for_each   = { for v in toset(["default"]) : "default" => v if local.recommended_settings.pods == true }
-  dn         = "uni/fabric/funcprof/podpgrp-${each.key}/rspodPGrpCoopP"
+  for_each   = local.policy_groups
   class_name = "fabricRsPodPGrpCoopP"
+  dn         = "uni/fabric/funcprof/podpgrp-${each.key}/rspodPGrpCoopP"
   content = {
-    tnCoopPolName = "${local.pods.policy_group.coop_group_policy}"
+    tnCoopPolName = "${each.value.coop_group_policy}"
   }
 }
 
@@ -45,11 +46,11 @@ resource "aci_rest_managed" "pod_policy_groups_date_and_time_policy" {
   depends_on = [
     aci_rest_managed.pod_policy_groups
   ]
-  for_each   = { for v in toset(["default"]) : "default" => v if local.recommended_settings.pods == true }
-  dn         = "uni/fabric/funcprof/podpgrp-${each.key}/rsTimePol"
+  for_each   = local.policy_groups
   class_name = "fabricRsTimePol"
+  dn         = "uni/fabric/funcprof/podpgrp-${each.key}/rsTimePol"
   content = {
-    tnDatetimePolName = "${local.pods.policy_group.date_time_policy}"
+    tnDatetimePolName = "${each.value.date_time_policy}"
   }
 }
 
@@ -57,11 +58,11 @@ resource "aci_rest_managed" "pod_policy_groups_isis_policy" {
   depends_on = [
     aci_rest_managed.pod_policy_groups
   ]
-  for_each   = { for v in toset(["default"]) : "default" => v if local.recommended_settings.pods == true }
-  dn         = "uni/fabric/funcprof/podpgrp-${each.key}/rspodPGrpIsisDomP"
+  for_each   = local.policy_groups
   class_name = "fabricRsPodPGrpIsisDomP"
+  dn         = "uni/fabric/funcprof/podpgrp-${each.key}/rspodPGrpIsisDomP"
   content = {
-    tnIsisDomPolName = "${local.pods.policy_group.isis_policy}"
+    tnIsisDomPolName = "${each.value.isis_policy}"
   }
 }
 
@@ -69,11 +70,11 @@ resource "aci_rest_managed" "pod_policy_groups_macsec_policy" {
   depends_on = [
     aci_rest_managed.pod_policy_groups
   ]
-  for_each   = { for v in toset(["default"]) : "default" => v if local.recommended_settings.pods == true }
-  dn         = "uni/fabric/funcprof/podpgrp-${each.key}/rsmacsecPol"
+  for_each   = local.policy_groups
   class_name = "fabricRsMacsecPol"
+  dn         = "uni/fabric/funcprof/podpgrp-${each.key}/rsmacsecPol"
   content = {
-    tnMacsecFabIfPolName = "${local.pods.policy_group.macsec_policy}"
+    tnMacsecFabIfPolName = "${each.value.macsec_policy}"
   }
 }
 
@@ -81,11 +82,11 @@ resource "aci_rest_managed" "pod_policy_groups_mgmt_policy" {
   depends_on = [
     aci_rest_managed.pod_policy_groups
   ]
-  for_each   = { for v in toset(["default"]) : "default" => v if local.recommended_settings.pods == true }
-  dn         = "uni/fabric/funcprof/podpgrp-${each.key}/rsCommPol"
+  for_each   = local.policy_groups
   class_name = "fabricRsCommPol"
+  dn         = "uni/fabric/funcprof/podpgrp-${each.key}/rsCommPol"
   content = {
-    tnCommPolName = "${local.pods.policy_group.management_access_policy}"
+    tnCommPolName = "${each.value.management_access_policy}"
   }
 }
 
@@ -93,11 +94,11 @@ resource "aci_rest_managed" "pod_policy_groups_snmp_policy" {
   depends_on = [
     aci_rest_managed.pod_policy_groups
   ]
-  for_each   = { for v in toset(["default"]) : "default" => v if local.recommended_settings.pods == true }
-  dn         = "uni/fabric/funcprof/podpgrp-${each.key}/rssnmpPol"
+  for_each   = local.policy_groups
   class_name = "fabricRsSnmpPol"
+  dn         = "uni/fabric/funcprof/podpgrp-${each.key}/rssnmpPol"
   content = {
-    tnSnmpPolName = "${local.pods.policy_group.snmp_policy}"
+    tnSnmpPolName = "${each.value.snmp_policy}"
   }
 }
 
@@ -115,12 +116,13 @@ resource "aci_rest_managed" "pod_profiles" {
   depends_on = [
     aci_rest_managed.pod_policy_groups
   ]
-  for_each   = { for v in toset(["default"]) : "default" => v if local.recommended_settings.pods == true }
+  for_each   = local.policy_groups
   class_name = "fabricPodP"
   dn         = "uni/fabric/podprof-${each.key}"
   content = {
-    descr = local.pods.profile.description
-    name  = each.key
+    #annotation = "orchestrator:terraform"
+    descr      = each.value.description
+    name       = each.key
   }
 }
 
@@ -139,14 +141,14 @@ resource "aci_rest_managed" "pod_profile_selectors_all" {
     aci_rest_managed.pod_profiles
   ]
   for_each = {
-    for v in toset(["default"]
-    ) : "default" => v if local.recommended_settings.pods == true && local.pods.profile.pod_selector_type == "ALL"
+    for k, v in local.profiles : k => v if v.pod_selector_type == "ALL"
   }
   class_name = "fabricPodS"
   dn         = "uni/fabric/podprof-${each.key}/pods-${each.key}-typ-ALL"
   content = {
-    name = each.key
-    type = local.pods.profile.pod_selector_type
+    #annotation = "orchestrator:terraform"
+    name       = each.key
+    type       = each.value.pod_selector_type
   }
   child {
     rn         = "rspodPGrp"
@@ -172,25 +174,25 @@ resource "aci_rest_managed" "pod_profile_selectors_range" {
     aci_rest_managed.pod_profiles
   ]
   for_each = {
-    for v in toset(["default"]
-    ) : "default" => v if local.recommended_settings.pods == true && local.pods.profile.pod_selector_type == "range"
+    for k, v in local.profiles : k => v if v.pod_selector_type == "range"
   }
   class_name = "fabricPodS"
-  dn         = "uni/fabric/podprof-default/pods-${each.key}-typ-range"
+  dn         = "uni/fabric/podprof-${each.key}/pods-${each.key}-typ-range"
   content = {
-    name = each.key
-    type = local.pods.profile.pod_selector_type
+    #annotation = "orchestrator:terraform"
+    name       = each.key
+    type       = each.value.pod_selector_type
   }
   child {
     rn = length(
-      local.pods.profile.pods
-      ) > 1 ? "podblk-${element(local.pods.profile.pods, 0)}_${element(local.pods.profile.pods, 1
-    )}" : "podblk-${element(local.pods.profile.pods, 0)}"
+      each.value.pods
+      ) > 1 ? "podblk-${element(each.value.pods, 0)}_${element(each.value.pods, 1
+    )}" : "podblk-${element(each.value.pods, 0)}"
     class_name = "fabricPodBlk"
     content = {
-      from_ = element(local.pods.profile.pods, 0)
-      to_ = length(local.pods.profile.pods) > 1 ? element(local.pods.profile.pods, 1
-      ) : element(local.pods.profile.pods, 0)
+      from_ = element(each.value.pods, 0)
+      to_ = length(each.value.pods) > 1 ? element(each.value.pods, 1
+      ) : element(each.value.pods, 0)
     }
   }
   child {
