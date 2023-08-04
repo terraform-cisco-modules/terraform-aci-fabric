@@ -13,8 +13,8 @@ resource "aci_rest_managed" "pod_policy_groups" {
   class_name = "fabricPodPGrp"
   content = {
     #annotation = "orchestrator:terraform"
-    descr      = each.value.description
-    name       = each.key
+    descr = each.value.description
+    name  = each.key
   }
 }
 
@@ -121,8 +121,8 @@ resource "aci_rest_managed" "pod_profiles" {
   dn         = "uni/fabric/podprof-${each.key}"
   content = {
     #annotation = "orchestrator:terraform"
-    descr      = each.value.description
-    name       = each.key
+    descr = each.value.description
+    name  = each.key
   }
 }
 
@@ -147,8 +147,8 @@ resource "aci_rest_managed" "pod_profile_selectors_all" {
   dn         = "uni/fabric/podprof-${each.key}/pods-${each.key}-typ-ALL"
   content = {
     #annotation = "orchestrator:terraform"
-    name       = each.key
-    type       = each.value.pod_selector_type
+    name = each.key
+    type = each.value.pod_selector_type
   }
   child {
     rn         = "rspodPGrp"
@@ -180,8 +180,8 @@ resource "aci_rest_managed" "pod_profile_selectors_range" {
   dn         = "uni/fabric/podprof-${each.key}/pods-${each.key}-typ-range"
   content = {
     #annotation = "orchestrator:terraform"
-    name       = each.key
-    type       = each.value.pod_selector_type
+    name = each.key
+    type = each.value.pod_selector_type
   }
   child {
     rn = length(

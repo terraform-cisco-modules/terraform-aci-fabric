@@ -120,11 +120,11 @@ resource "aci_rest_managed" "snmp_policies" {
   dn         = "uni/fabric/snmppol-${each.key}"
   content = {
     #annotation = "orchestrator:terraform"
-    adminSt    = each.value.admin_state
-    contact    = each.value.contact
-    descr      = each.value.description
-    loc        = each.value.location
-    name       = each.key
+    adminSt = each.value.admin_state
+    contact = each.value.contact
+    descr   = each.value.description
+    loc     = each.value.location
+    name    = each.key
   }
 }
 
@@ -261,8 +261,8 @@ resource "aci_rest_managed" "snmp_destination_groups" {
   dn         = "uni/fabric/snmpgroup-${each.key}"
   content = {
     #annotation = "orchestrator:terraform"
-    descr      = each.value.description
-    name       = each.key
+    descr = each.value.description
+    name  = each.key
   }
 }
 
@@ -271,7 +271,7 @@ resource "aci_rest_managed" "snmp_destination_groups" {
 
 API Information:
  - Class: "snmpTrapDest"
- - Distinguished Name: "uni/fabric/snmpgroup-{snmp_monitoring_destination_group}"
+ - Distinguished Name: "uni/fabric/snmpgroup-{snmp_group}/trapdest-{host}-port-{port}"
 GUI Location:
  - Admin > External Data Collectors > Monitoring Destinations > SNMP > {snmp_monitoring_destination_group}
 _______________________________________________________________________________________________________________________
