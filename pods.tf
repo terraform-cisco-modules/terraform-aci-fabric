@@ -26,7 +26,7 @@ resource "aci_rest_managed" "pod_policy_groups_bgp_rr_policy" {
   class_name = "fabricRsPodPGrpBGPRRP"
   dn         = "uni/fabric/funcprof/podpgrp-${each.key}/rspodPGrpBGPRRP"
   content = {
-    tnBgpInstPolName = "${each.value.bgp_route_reflector_policy}"
+    tnBgpInstPolName = each.value.bgp_route_reflector_policy
   }
 }
 
@@ -38,7 +38,7 @@ resource "aci_rest_managed" "pod_policy_groups_coop_policy" {
   class_name = "fabricRsPodPGrpCoopP"
   dn         = "uni/fabric/funcprof/podpgrp-${each.key}/rspodPGrpCoopP"
   content = {
-    tnCoopPolName = "${each.value.coop_group_policy}"
+    tnCoopPolName = each.value.coop_group_policy
   }
 }
 
@@ -50,7 +50,7 @@ resource "aci_rest_managed" "pod_policy_groups_date_and_time_policy" {
   class_name = "fabricRsTimePol"
   dn         = "uni/fabric/funcprof/podpgrp-${each.key}/rsTimePol"
   content = {
-    tnDatetimePolName = "${each.value.date_time_policy}"
+    tnDatetimePolName = each.value.date_time_policy
   }
 }
 
@@ -62,7 +62,7 @@ resource "aci_rest_managed" "pod_policy_groups_isis_policy" {
   class_name = "fabricRsPodPGrpIsisDomP"
   dn         = "uni/fabric/funcprof/podpgrp-${each.key}/rspodPGrpIsisDomP"
   content = {
-    tnIsisDomPolName = "${each.value.isis_policy}"
+    tnIsisDomPolName = each.value.isis_policy
   }
 }
 
@@ -74,7 +74,7 @@ resource "aci_rest_managed" "pod_policy_groups_macsec_policy" {
   class_name = "fabricRsMacsecPol"
   dn         = "uni/fabric/funcprof/podpgrp-${each.key}/rsmacsecPol"
   content = {
-    tnMacsecFabIfPolName = "${each.value.macsec_policy}"
+    tnMacsecFabIfPolName = each.value.macsec_policy
   }
 }
 
@@ -86,7 +86,7 @@ resource "aci_rest_managed" "pod_policy_groups_mgmt_policy" {
   class_name = "fabricRsCommPol"
   dn         = "uni/fabric/funcprof/podpgrp-${each.key}/rsCommPol"
   content = {
-    tnCommPolName = "${each.value.management_access_policy}"
+    tnCommPolName = each.value.management_access_policy
   }
 }
 
@@ -98,7 +98,7 @@ resource "aci_rest_managed" "pod_policy_groups_snmp_policy" {
   class_name = "fabricRsSnmpPol"
   dn         = "uni/fabric/funcprof/podpgrp-${each.key}/rssnmpPol"
   content = {
-    tnSnmpPolName = "${each.value.snmp_policy}"
+    tnSnmpPolName = each.value.snmp_policy
   }
 }
 

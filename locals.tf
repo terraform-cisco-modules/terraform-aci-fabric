@@ -10,6 +10,7 @@ locals {
   global     = lookup(lookup(var.fabric, "policies", {}), "global", {})
   interface  = lookup(lookup(var.fabric, "policies", {}), "interface", {})
   l3int      = local.defaults.policies.interface.l3_interface
+  mgmt_epgs  = var.fabric.management_epgs
   monitoring = lookup(lookup(var.fabric, "policies", {}), "monitoring", {})
   lpods      = local.defaults.pods
   pod        = lookup(lookup(var.fabric, "policies", {}), "pod", {})
@@ -42,7 +43,7 @@ locals {
       dns_providers         = lookup(v, "dns_providers", [])
       ip_version_preference = lookup(v, "ip_version_preference", local.dns.ip_version_preference)
       management_epg        = lookup(v, "management_epg", local.dns.management_epg)
-      mgmt_epg_type = var.management_epgs[index(var.management_epgs.*.name,
+      mgmt_epg_type = local.mgmt_epgs[index(local.mgmt_epgs[*].name,
         lookup(v, "management_epg", local.dns.management_epg))
       ].type
     }
@@ -83,7 +84,7 @@ locals {
   date_and_time = {
     for v in lookup(local.pod, "date_and_time", []) : v.name => merge(local.time, v, {
       authentication_keys = lookup(v, "authentication_keys", [])
-      mgmt_epg_type = var.management_epgs[index(var.management_epgs.*.name,
+      mgmt_epg_type = local.mgmt_epgs[index(local.mgmt_epgs[*].name,
         lookup(v, "management_epg", local.time.management_epg))
       ].type
       ntp_servers = lookup(v, "ntp_servers", [])
@@ -569,99 +570,61 @@ locals {
   #__________________________________________________________
 
   snmp_policies = {
-    for v in lookup(local.pod, "snmp", []) : v.name => {
-      admin_state = lookup(v, "admin_state", local.SNMP.admin_state)
-      contact     = lookup(v, "contact", local.SNMP.contact)
-      description = lookup(v, "description", local.SNMP.description)
-      include_types = {
-        audit_logs   = lookup(lookup(v, "include_types", {}), "audit_logs", local.SNMP.include_types.audit_logs)
-        events       = lookup(lookup(v, "include_types", {}), "events", local.SNMP.include_types.events)
-        faults       = lookup(lookup(v, "include_types", {}), "faults", local.SNMP.include_types.faults)
-        session_logs = lookup(lookup(v, "include_types", {}), "session_logs", local.SNMP.include_types.session_logs)
-      }
-      location           = lookup(v, "location", local.SNMP.location)
+    for v in lookup(local.pod, "snmp", []) : v.name => merge(local.SNMP, v, {
+      include_types      = merge(local.SNMP.include_types, lookup(v, "include_types", {}))
       snmp_client_groups = lookup(v, "snmp_client_groups", [])
       snmp_communities   = lookup(v, "snmp_communities", [])
       snmp_destinations  = lookup(v, "snmp_destinations", [])
       users              = lookup(v, "users", [])
-    }
+    })
   }
 
-  snmp_client_groups = {
-    for i in flatten([
-      for key, value in local.snmp_policies : [
-        for k, v in value.snmp_client_groups : {
-          clients        = lookup(v, "clients", [])
-          description    = lookup(v, "description", local.SNMP.snmp_client_groups.description)
-          management_epg = lookup(v, "management_epg", local.SNMP.snmp_client_groups.management_epg)
-          mgmt_epg_type = var.management_epgs[index(var.management_epgs.*.name,
-            lookup(v, "management_epg", local.SNMP.snmp_client_groups.management_epg))
-          ].type
-          name        = v.name
-          snmp_policy = key
-        }
-      ]
-    ]) : "${i.snmp_policy}:${i.name}" => i
-  }
+  snmp_client_groups = { for i in flatten([
+    for key, value in local.snmp_policies : [
+      for k, v in value.snmp_client_groups : merge(local.SNMP.snmp_client_groups, v, {
+        clients = lookup(v, "clients", [])
+        mgmt_epg_type = local.mgmt_epgs[index(local.mgmt_epgs[*].name,
+          lookup(v, "management_epg", local.SNMP.snmp_client_groups.management_epg))
+        ].type
+        snmp_policy = key
+      })
+    ]
+  ]) : "${i.snmp_policy}:${i.name}" => i }
 
-  snmp_client_group_clients = {
-    for i in flatten([
-      for key, value in local.snmp_client_groups : [
-        for v in value.clients : {
-          address      = v.address
-          name         = lookup(v, "name", v.address)
-          snmp_policy  = value.snmp_policy
-          client_group = value.name
-        }
-      ]
-    ]) : "${i.snmp_policy}:${i.client_group}:${i.address}" => i
-  }
+  snmp_client_group_clients = { for i in flatten([
+    for key, value in local.snmp_client_groups : [
+      for v in value.clients : {
+        address      = v.address
+        name         = lookup(v, "name", v.address)
+        snmp_policy  = value.snmp_policy
+        client_group = value.name
+      }
+    ]
+  ]) : "${i.snmp_policy}:${i.client_group}:${i.address}" => i }
 
-  snmp_communities = {
-    for i in flatten([
-      for key, value in local.snmp_policies : [
-        for k, v in value.snmp_communities : {
-          community_variable = v.community_variable
-          description        = lookup(v, "description", local.SNMP.snmp_communities.description)
-          snmp_policy        = key
-        }
-      ]
-    ]) : "${i.snmp_policy}:${i.community_variable}" => i
-  }
+  snmp_communities = { for i in flatten([
+    for key, value in local.snmp_policies : [
+      for k, v in value.snmp_communities : merge(local.SNMP.snmp_communities, v, { snmp_policy = key })
+    ]
+  ]) : "${i.snmp_policy}:${i.community}" => i }
 
-  snmp_policies_users = {
-    for i in flatten([
-      for key, value in local.snmp_policies : [
-        for k, v in value.users : {
-          authorization_key  = v.authorization_key
-          authorization_type = lookup(v, "authorization_type", local.SNMP.users.authorization_type)
-          privacy_key        = lookup(v, "privacy_key", 0)
-          privacy_type       = lookup(v, "privacy_type", local.SNMP.users.privacy_type)
-          snmp_policy        = key
-          username           = v.username
-        }
-      ]
-    ]) : "${i.snmp_policy}:${i.username}" => i
-  }
+  snmp_policies_users = { for i in flatten([
+    for key, value in local.snmp_policies : [
+      for k, v in value.users : merge(local.SNMP.users, v, { snmp_policy = key })
+    ]
+  ]) : "${i.snmp_policy}:${i.username}" => i }
 
-  snmp_trap_destinations = {
-    for i in flatten([
-      for key, value in local.snmp_policies : [
-        for k, v in value.snmp_destinations : {
-          community_variable = lookup(v, "community_variable", 0)
-          host               = v.host
-          management_epg     = lookup(v, "management_epg", local.SNMP.snmp_destinations.management_epg)
-          mgmt_epg_type = var.management_epgs[index(var.management_epgs.*.name,
-            lookup(v, "management_epg", local.SNMP.snmp_destinations.management_epg))
-          ].type
-          port        = lookup(v, "port", local.SNMP.snmp_destinations.port)
-          username    = lookup(v, "username", "")
-          snmp_policy = key
-          v3_security_level = length(compact([lookup(v, "username", "")])
-          ) == 0 ? "noauth" : lookup(v, "v3_security_level", local.SNMP.snmp_destinations.v3_security_level)
-          version = length(compact([lookup(v, "username", "")])) > 0 ? "v3" : "v2c"
-        }
-      ]
-    ]) : "${i.snmp_policy}:${i.host}" => i
-  }
+  snmp_trap_destinations = { for i in flatten([
+    for key, value in local.snmp_policies : [
+      for k, v in value.snmp_destinations : merge(local.SNMP.snmp_destinations, v, {
+        mgmt_epg_type = local.mgmt_epgs[index(local.mgmt_epgs[*].name,
+          lookup(v, "management_epg", local.SNMP.snmp_destinations.management_epg))
+        ].type
+        snmp_policy = key
+        v3_security_level = length(compact([lookup(v, "username", "")])
+        ) == 0 ? "noauth" : lookup(v, "v3_security_level", local.SNMP.snmp_destinations.v3_security_level)
+        version = length(compact([lookup(v, "username", "")])) > 0 ? "v3" : "v2c"
+      })
+    ]
+  ]) : "${i.snmp_policy}:${i.host}" => i }
 }

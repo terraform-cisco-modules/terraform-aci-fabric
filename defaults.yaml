@@ -24,16 +24,16 @@ defaults:
         dns_profiles:
           description: ''
           dns_domains:
-            domain: '**REQUIRED**'
+            domain: ''
             default_domain: false
             description: ''
           dns_providers:
             description: ''
-            dns_provider: '**REQUIRED**'
+            dns_provider: ''
             preferred: false
           ip_version_preference: IPv4
           management_epg: default
-          name: '**REQUIRED**'
+          name: ''
       interface:
         l3_interface:
           bfd_isis_policy_configuration: enabled
@@ -50,7 +50,7 @@ defaults:
           administrative_state: enabled
           authentication_keys:
             authentication_type: sha1
-            key_id: 0
+            key_id: 1
             trusted: true
           description: ''
           display_format: local
@@ -58,10 +58,10 @@ defaults:
           master_mode: disabled
           maximum_polling_interval: 6
           minimum_polling_interval: 4
-          name: '**REQUIRED**'
+          name: ''
           ntp_servers:
             description: ''
-            hostname: '**REQUIRED**'
+            hostname: ''
             key_id: 0
             preferred: false
           offset_state: enabled
@@ -78,27 +78,28 @@ defaults:
               faults: true
               session_logs: false
           location: ''
-          name: '**REQUIRED**'
+          name: ''
           snmp_client_groups:
               clients:
-                address: '**REQUIRED**'
+                address: ''
                 name: ''
               description: ''
               management_epg: default
               name: default
           snmp_communities:
-            community_variable: 0
+            community: 1
             description: ''
           snmp_destinations:
-            host: '**REQUIRED**'
+            community: 1
+            host: ''
             management_epg: default
             port: 162
-            username: '**REQUIRED**'
+            username: ''
             v3_security_level: auth # auth, noauth, priv
             version: v3 # v2c, v3
           users:
             authorization_key: 1
             authorization_type: hmac-sha1-96 # hmac-md5-96, hmac-sha1-96, hmac-sha1-224, hmac-sha1-256, hmac-sha1-384, hmac-sha1-512
-            privacy_key: 0
+            privacy_key: 1
             privacy_type: none # aes-128, des, none
-            username: '**REQUIRED**'
+            username: ''

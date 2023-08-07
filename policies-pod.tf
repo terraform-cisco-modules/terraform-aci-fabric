@@ -40,12 +40,8 @@ resource "aci_rest_managed" "date_and_time_authentication_keys" {
   class_name = "datetimeNtpAuthKey"
   dn         = "uni/fabric/time-${each.value.policy}/ntpauth-${each.value.key_id}"
   content = {
-    id = each.value.key_id
-    key = length(regexall(
-      5, each.value.key_id)) > 0 ? var.ntp_key_5 : length(regexall(
-      4, each.value.key_id)) > 0 ? var.ntp_key_4 : length(regexall(
-      3, each.value.key_id)) > 0 ? var.ntp_key_3 : length(regexall(
-    2, each.value.key_id)) > 0 ? var.ntp_key_2 : var.ntp_key_1
+    id      = each.value.key_id
+    key     = var.fabric_sensitive.ntp.key_id[each.value.key_id]
     keyType = each.value.authentication_type
   }
 }
@@ -66,7 +62,7 @@ resource "aci_rest_managed" "date_and_time_ntp_servers" {
   dn         = "uni/fabric/time-${each.value.policy}/ntpprov-${each.value.hostname}"
   content = {
     descr      = each.value.description
-    keyId      = length(regexall("[1-5]", each.value.key_id)) > 0 ? each.value.key_id : 0
+    keyId      = each.value.key_id
     maxPoll    = each.value.maximum_polling_interval
     minPoll    = each.value.minimum_polling_interval
     name       = each.value.hostname
@@ -198,11 +194,7 @@ resource "aci_snmp_community" "snmp_policy_communities" {
   ]
   for_each  = local.snmp_communities
   parent_dn = aci_rest_managed.snmp_policies[each.value.snmp_policy].id
-  name = length(regexall(
-    5, each.value.community_variable)) > 0 ? var.snmp_community_5 : length(regexall(
-    4, each.value.community_variable)) > 0 ? var.snmp_community_4 : length(regexall(
-    3, each.value.community_variable)) > 0 ? var.snmp_community_3 : length(regexall(
-  2, each.value.community_variable)) > 0 ? var.snmp_community_2 : var.snmp_community_1
+  name      = var.fabric_sensitive.snmp.community[each.value.community]
 }
 
 /*_____________________________________________________________________________________________________________________
@@ -222,19 +214,11 @@ resource "aci_rest_managed" "snmp_policy_users" {
   class_name = "snmpUserP"
   dn         = "uni/fabric/snmppol-${each.value.snmp_policy}/user-[${each.value.username}]"
   content = {
-    authKey = length(regexall(
-      5, each.value.authorization_key)) > 0 ? var.snmp_authorization_key_5 : length(regexall(
-      4, each.value.authorization_key)) > 0 ? var.snmp_authorization_key_4 : length(regexall(
-      3, each.value.authorization_key)) > 0 ? var.snmp_authorization_key_3 : length(regexall(
-    2, each.value.authorization_key)) > 0 ? var.snmp_authorization_key_2 : var.snmp_authorization_key_1
+    authKey  = var.fabric_sensitive.snmp.authorization_key[each.value.authorization_key]
     authType = each.value.authorization_type
     name     = each.value.username
-    privKey = length(regexall(
-      5, each.value.privacy_key)) > 0 ? var.snmp_privacy_key_5 : length(regexall(
-      4, each.value.privacy_key)) > 0 ? var.snmp_privacy_key_4 : length(regexall(
-      3, each.value.privacy_key)) > 0 ? var.snmp_privacy_key_3 : length(regexall(
-      2, each.value.privacy_key)) > 0 ? var.snmp_privacy_key_2 : length(regexall(
-    1, each.value.privacy_key)) > 0 ? var.snmp_privacy_key_1 : ""
+    privKey = length(regexall("none", each.value.privacy_type)
+    ) == 0 ? var.fabric_sensitive.snmp.privacy_key[each.value.privacy_key] : ""
     privType = each.value.privacy_type
   }
   lifecycle {
@@ -287,12 +271,9 @@ resource "aci_rest_managed" "snmp_trap_destinations" {
     #annotation = "orchestrator:terraform"
     host = each.value.host
     port = each.value.port
-    secName = each.value.version != "v3" && length(regexall(
-      5, each.value.community_variable)) > 0 ? var.snmp_community_5 : each.value.version != "v3" && length(regexall(
-      4, each.value.community_variable)) > 0 ? var.snmp_community_4 : each.value.version != "v3" && length(regexall(
-      3, each.value.community_variable)) > 0 ? var.snmp_community_3 : each.value.version != "v3" && length(regexall(
-      2, each.value.community_variable)) > 0 ? var.snmp_community_2 : each.value.version != "v3" && length(regexall(
-    1, each.value.community_variable)) > 0 ? var.snmp_community_1 : each.value.version == "v3" ? each.value.username : "unknown"
+    secName = length(compact([each.value.username])
+      ) > 0 ? each.value.username : length(compact([var.fabric_sensitive.snmp.community[each.value.community]])
+    ) > 0 ? var.fabric_sensitive.snmp.community[each.value.community] : "unknown"
     v3SecLvl = each.value.version == "v3" ? each.value.v3_security_level : "noauth"
     ver      = each.value.version
   }
