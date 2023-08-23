@@ -10,7 +10,7 @@ locals {
   global     = lookup(lookup(var.fabric, "policies", {}), "global", {})
   interface  = lookup(lookup(var.fabric, "policies", {}), "interface", {})
   l3int      = local.defaults.policies.interface.l3_interface
-  mgmt_epgs  = var.fabric.management_epgs
+  mgmt_epgs  = var.fabric.global_settings.management_epgs
   monitoring = lookup(lookup(var.fabric, "policies", {}), "monitoring", {})
   lpods      = local.defaults.pods
   pod        = lookup(lookup(var.fabric, "policies", {}), "pod", {})
