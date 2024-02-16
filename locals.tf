@@ -59,7 +59,7 @@ locals {
           policy         = key
         }
       ]
-    ]) : "${i.policy}:${i.domain}" => i
+    ]) : "${i.policy}/${i.domain}" => i
   }
 
   dns_providers = {
@@ -72,7 +72,7 @@ locals {
           policy       = key
         }
       ]
-    ]) : "${i.policy}:${i.dns_provider}" => i
+    ]) : "${i.policy}/${i.dns_provider}" => i
   }
 
 
@@ -520,7 +520,7 @@ locals {
           trusted = lookup(v, "trusted", local.time.authentication_keys.trusted)
         }
       ]
-    ]) : "${i.policy}_${i.key_id}" => i
+    ]) : "${i.policy}/${i.key_id}" => i
   }
 
   ntp_servers = {
@@ -542,7 +542,7 @@ locals {
           preferred = lookup(s, "preferred", local.time.ntp_servers.preferred)
         }
       ]
-    ]) : "${i.policy}:${i.hostname}" => i
+    ]) : "${i.policy}/${i.hostname}" => i
   }
 
 
@@ -589,7 +589,7 @@ locals {
         snmp_policy = key
       })
     ]
-  ]) : "${i.snmp_policy}:${i.name}" => i }
+  ]) : "${i.snmp_policy}/${i.name}" => i }
 
   snmp_client_group_clients = { for i in flatten([
     for key, value in local.snmp_client_groups : [
@@ -600,7 +600,7 @@ locals {
         client_group = value.name
       }
     ]
-  ]) : "${i.snmp_policy}:${i.client_group}:${i.address}" => i }
+  ]) : "${i.snmp_policy}/${i.client_group}/${i.address}" => i }
 
   snmp_communities = { for i in flatten([
     for key, value in local.snmp_policies : [
@@ -612,7 +612,7 @@ locals {
     for key, value in local.snmp_policies : [
       for k, v in value.users : merge(local.SNMP.users, v, { snmp_policy = key })
     ]
-  ]) : "${i.snmp_policy}:${i.username}" => i }
+  ]) : "${i.snmp_policy}/${i.username}" => i }
 
   snmp_trap_destinations = { for i in flatten([
     for key, value in local.snmp_policies : [
@@ -626,5 +626,5 @@ locals {
         version = length(compact([lookup(v, "username", "")])) > 0 ? "v3" : "v2c"
       })
     ]
-  ]) : "${i.snmp_policy}:${i.host}" => i }
+  ]) : "${i.snmp_policy}/${i.host}" => i }
 }
