@@ -59,7 +59,7 @@ output "policies" {
         for v in sort(keys(aci_rest_managed.snmp_policy_trap_servers)) : v => aci_rest_managed.snmp_policy_trap_servers[v].id
       }
       snmp_policy_users = {
-        for v in sort(keys(aci_rest_managed.snmp_policy_users)) : v => aci_rest_managed.snmp_policy_users[v].id
+        for v in sort(keys(aci_snmp_user.map)) : v => aci_snmp_user.map[v].id
       }
     }
   }

@@ -12,7 +12,6 @@ resource "aci_rest_managed" "dns_profiles" {
   class_name = "dnsProfile"
   dn         = "uni/fabric/dnsp-${each.key}"
   content = {
-    #annotation      = "orchestrator:terraform"
     descr           = each.value.description
     IPVerPreference = each.value.ip_version_preference
     name            = each.key
@@ -65,7 +64,7 @@ resource "aci_rest_managed" "dns_domains" {
   ]
   for_each   = local.dns_domains
   class_name = "dnsDomain"
-  dn         = "uni/fabric/dnsp-${each.value.policy}/dom-[${each.value.domain}]"
+  dn         = "uni/fabric/dnsp-${each.value.policy}/dom-${each.value.domain}"
   content = {
     descr     = each.value.description
     isDefault = each.value.default_domain == true ? "yes" : "no"

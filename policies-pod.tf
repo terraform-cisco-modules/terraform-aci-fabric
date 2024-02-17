@@ -12,7 +12,6 @@ resource "aci_rest_managed" "date_and_time" {
   class_name = "datetimePol"
   dn         = "uni/fabric/time-${each.key}"
   content = {
-    #annotation   = "orchestrator:terraform"
     adminSt      = each.value.administrative_state
     authSt       = length(each.value.authentication_keys) > 0 ? "enabled" : "disabled"
     descr        = each.value.description
@@ -93,7 +92,6 @@ resource "aci_rest_managed" "date_and_time_format" {
   class_name = "datetimeFormat"
   dn         = "uni/fabric/format-default"
   content = {
-    #annotation    = "orchestrator:terraform"
     displayFormat = each.value.display_format
     showOffset    = each.value.offset_state
     tz            = each.value.time_zone
@@ -115,7 +113,6 @@ resource "aci_rest_managed" "snmp_policies" {
   class_name = "snmpPol"
   dn         = "uni/fabric/snmppol-${each.key}"
   content = {
-    #annotation = "orchestrator:terraform"
     adminSt = each.value.admin_state
     contact = each.value.contact
     descr   = each.value.description
@@ -188,7 +185,7 @@ GUI Location:
  - Fabric > Fabric Policies > Policies > Pod > SNMP > {snmp_policy} > Community Policies
 _______________________________________________________________________________________________________________________
 */
-resource "aci_snmp_community" "snmp_policy_communities" {
+resource "aci_snmp_community" "map" {
   depends_on = [
     aci_rest_managed.snmp_policies
   ]
@@ -206,27 +203,17 @@ GUI Location:
  - Fabric > Fabric Policies > Policies > Pod > SNMP > {snmp_policy}: SNMP V3 Users
 _______________________________________________________________________________________________________________________
 */
-resource "aci_rest_managed" "snmp_policy_users" {
+resource "aci_snmp_user" "map" {
   depends_on = [
     aci_rest_managed.snmp_policies
   ]
-  for_each   = local.snmp_policies_users
-  class_name = "snmpUserP"
-  dn         = "uni/fabric/snmppol-${each.value.snmp_policy}/user-[${each.value.username}]"
-  content = {
-    authKey  = var.fabric_sensitive.snmp.authorization_key[each.value.authorization_key]
-    authType = each.value.authorization_type
-    name     = each.value.username
-    privKey = length(regexall("none", each.value.privacy_type)
-    ) == 0 ? var.fabric_sensitive.snmp.privacy_key[each.value.privacy_key] : ""
-    privType = each.value.privacy_type
-  }
-  lifecycle {
-    ignore_changes = [
-      content.authKey,
-      content.privKey
-    ]
-  }
+  for_each           = local.snmp_policies_users
+  authorization_key  = var.fabric_sensitive.snmp.authorization_key[each.value.authorization_key]
+  authorization_type = each.value.authorization_type
+  name               = each.value.username
+  privacy_key        = length(regexall("none", each.value.privacy_type)) == 0 ? var.fabric_sensitive.snmp.privacy_key[each.value.privacy_key] : ""
+  privacy_type       = each.value.privacy_type
+  snmp_policy_dn     = aci_rest_managed.snmp_policies[each.value.snmp_policy].id
 }
 
 
@@ -244,7 +231,6 @@ resource "aci_rest_managed" "snmp_destination_groups" {
   class_name = "snmpGroup"
   dn         = "uni/fabric/snmpgroup-${each.key}"
   content = {
-    #annotation = "orchestrator:terraform"
     descr = each.value.description
     name  = each.key
   }
@@ -268,7 +254,6 @@ resource "aci_rest_managed" "snmp_trap_destinations" {
   class_name = "snmpTrapDest"
   dn         = "uni/fabric/snmpgroup-${each.value.snmp_policy}/trapdest-${each.value.host}-port-${each.value.port}"
   content = {
-    #annotation = "orchestrator:terraform"
     host = each.value.host
     port = each.value.port
     secName = length(compact([each.value.username])
@@ -304,7 +289,6 @@ resource "aci_rest_managed" "snmp_policy_trap_servers" {
   class_name = "snmpTrapFwdServerP"
   dn         = "uni/fabric/snmppol-${each.value.snmp_policy}/trapfwdserver-[${each.value.host}]"
   content = {
-    #annotation = "orchestrator:terraform"
     addr = each.value.host
     port = each.value.port
   }
@@ -325,7 +309,6 @@ resource "aci_rest_managed" "snmp_trap_source" {
   class_name = "snmpSrc"
   dn         = "uni/fabric/moncommon/snmpsrc-${each.key}"
   content = {
-    #annotation = "orchestrator:terraform"
     incl = alltrue(
       [
         each.value.include_types.audit_logs,
