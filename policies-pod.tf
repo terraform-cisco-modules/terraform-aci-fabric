@@ -84,7 +84,7 @@ API Information:
  - Class: "datetimeFormat"
  - Distinguished Name: "uni/fabric/format-default"
 GUI Location:
- - System Settings > Data and Time
+ - System Settings > Date and Time
 _______________________________________________________________________________________________________________________
 */
 resource "aci_rest_managed" "date_and_time_format" {

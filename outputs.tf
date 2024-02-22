@@ -1,4 +1,11 @@
 output "pods" {
+  description = <<-EOT
+    Identifiers for:
+      * policy_groups: Fabric => Policy Groups: {Name}
+      * recurring_window: Admin => Schedulers => Fabric => {schedule_name} => Recurring Windows.
+      * remote_locations: Admin => Import/Export => Remote Locations.
+      * schedulers: Admin => Schedulers => Fabric.
+  EOT
   value = {
     policy_groups = {
       for v in sort(keys(aci_rest_managed.pod_policy_groups)) : v => aci_rest_managed.pod_policy_groups[v].id
@@ -9,6 +16,27 @@ output "pods" {
   }
 }
 output "policies" {
+  description = <<-EOT
+    Identifiers for:
+      * global:
+        - dns_profiles: Fabric => Fabric Policies => Policies => Global => DNS Profiles: {Name}
+          * dns_domains:  Fabric => Fabric Policies => Policies => Global => DNS Profiles: {Name} => DNS Domains
+          * dns_providers:  Fabric => Fabric Policies => Policies => Global => DNS Profiles: {Name} => DNS Providers
+      * interface:
+        - L3 Interface:  Fabric => Fabric Policies => Policies => Interface => L3 Interface: {default}
+      * monitoring:
+        - fabric_node_controls:  Fabric => Fabric Policies => Policies => Monitoring => Fabric Node Controls: {default}
+      * pod:
+        - date_and_time: Fabric => Fabric Policies => Policies => Pod => Date and Time: {default}
+          * date_and_time_servers: Fabric => Fabric Policies => Policies => Pod => Date and Time: {default} => NTP Servers
+        - date_and_time_format: System Settings => Date and Time
+        - snmp_destination_groups: Admin => External Data Collectors => Monitoring Destinations => SNMP => {snmp_monitoring_destination_group}
+        - snmp_policies: Fabric => Fabric Policies => Policies => Pod => SNMP: {default}
+          * snmp_policy_client_groups: Fabric => Fabric Policies => Policies => Pod => SNMP: {default} => Client Group Policies
+            - snmp_policy_client_group_client_servers: Fabric => Fabric Policies => Policies => Pod => SNMP: {default} => Client Group Policies: Client Entries
+          * snmp_policy_trap_servers: Fabric => Fabric Policies => Policies => Pod => SNMP: {default} => Trap Forward Servers
+          * snmp_policy_users: Fabric => Fabric Policies => Policies => Pod => SNMP: {default} => SNMP V3 Users
+  EOT
   value = {
     global = {
       dns_profiles = {
